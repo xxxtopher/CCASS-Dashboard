@@ -111,6 +111,26 @@ def fetch_day(opener, code5, date_str):
                            f"(HKEX may be in maintenance, or the form changed; see data/_last_hkex_debug.html)")
     return rows, issued
 
+# Known corporate actions that change total issued shares (verified):
+# 2501 placed 58,838,000 new shares, completed 2026-09-07 — issued was
+# 500,000,000 before that date and 558,838,000 from it (HKEX announcement
+# + Sep 2026 Monthly Return). HKEX SDW only shows the *current* issued
+# figure, so without this a backfill over the placing would stamp the new
+# figure onto pre-placing dates and understate their % owned.
+# Format: code -> [(effective_date or None, issued_shares), ...] sorted.
+ISSUED_EVENTS = {"2501": [(None, 500000000), ("2026-09-07", 558838000)]}
+MAX_HISTORY_DAYS = 90  # keep at most 90 trading days of CCASS history
+
+def issued_for_date(code, ds, page_issued):
+    events = ISSUED_EVENTS.get(code)
+    if not events:
+        return page_issued
+    value = None
+    for eff, val in events:
+        if eff is None or ds >= eff:
+            value = val
+    return value if value is not None else page_issued
+
 def trading_days_back(end, n):
     out, d = [], end
     while len(out) < n:
@@ -153,13 +173,14 @@ def main():
             continue
         print(f"Fetching {code5} {ds} ...", flush=True)
         rows, issued = fetch_day(opener, code5, ds)
+        # Record issued shares PER DATE: the denominator for that date's
+        # % owned. Total issued only changes on a corporate action
+        # (placing, buyback, ...); shares moving between CCASS and
+        # non-CCASS holders change the CCASS / Not-in-CCASS split, not
+        # the issued total. Keeping it per-date means a future placing
+        # won't rewrite the % owned on past dates.
+        issued = issued_for_date(short, ds, issued)
         if issued:
-            # Record issued shares PER DATE: the denominator for that
-            # date's % owned. Total issued only changes on a corporate
-            # action (placing, buyback, ...); shares moving between
-            # CCASS and non-CCASS holders change the CCASS / Not-in-CCASS
-            # split, not the issued total. Keeping it per-date means a
-            # future placing won't rewrite the % owned on past dates.
             hist["issued_shares"] = issued
             hist.setdefault("issued_by_date", {})[ds] = issued
         latest_pct = {r["participant_id"]: r["pct_issued"] for r in rows}
@@ -174,7 +195,17 @@ def main():
                                  {"participant_id": r["participant_id"], "name": r["name"], "holdings": []})
             p["holdings"] += [None] * (idx - len(p["holdings"]))
             p["holdings"].insert(idx, r["holding"])
+        # Participants NOT holding on this date still need a None AT idx —
+        # appending it at the end (the old code) silently shifted every
+        # later holding one slot left, so Nov 6 totals came out ~28M
+        # shares light after a July backfill. This bug only bites when a
+        # date is inserted before existing ones (backfill); appending the
+        # latest day is unaffected.
+        today_ids = {r["participant_id"] for r in rows}
         for p in by_id.values():
+            if p["participant_id"] not in today_ids:
+                p["holdings"] += [None] * (idx - len(p["holdings"]))
+                p["holdings"].insert(idx, None)
             p["holdings"] += [None] * (len(hist["dates"]) - len(p["holdings"]))
         # Save progress after every day, so a later HKEX timeout
         # does not lose the days already fetched.
@@ -182,6 +213,20 @@ def main():
         hist_path.write_text(json.dumps(hist, indent=2), encoding="utf-8")
         print(f"  saved {ds}: {len(rows)} participants", flush=True)
         time.sleep(2)  # polite pacing
+
+    # Cap history at MAX_HISTORY_DAYS trading days: oldest dates drop off
+    # the front (holdings arrays and issued_by_date trimmed with them), so
+    # the file — and the charts — stay fast as the daily run adds days.
+    if len(hist["dates"]) > MAX_HISTORY_DAYS:
+        drop = len(hist["dates"]) - MAX_HISTORY_DAYS
+        hist["dates"] = hist["dates"][drop:]
+        for p in hist["participants"]:
+            p["holdings"] = p["holdings"][drop:]
+        if "issued_by_date" in hist:
+            hist["issued_by_date"] = {d: hist["issued_by_date"][d]
+                                      for d in hist["dates"] if d in hist["issued_by_date"]}
+        hist_path.write_text(json.dumps(hist, indent=2), encoding="utf-8")
+        print(f"  trimmed history to latest {MAX_HISTORY_DAYS} trading days", flush=True)
 
     # Latest-day table: today vs previous date in history
     if len(hist["dates"]) >= 2:
