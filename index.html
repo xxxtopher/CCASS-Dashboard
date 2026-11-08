@@ -96,29 +96,35 @@ const fmt = n => n==null ? '—' : Math.round(n).toLocaleString('en-US');
 const fmtSigned = n => (n>0?'+':'') + fmt(n);
 
 async function loadStock(code){
+  // File names use the SHORT code (2501, not 02501): the fetch scripts
+  // save data/price_<short>.json, data/ccass_history_<short>.json, etc.
+  // The page used to pad to 5 digits (02501) and so looked for files
+  // that don't exist — that was the "No price file data/price_02501.json"
+  // error on the live site. Fixed 2026-11-07.
   const clean = code.replace(/[^0-9]/g,'').padStart(5,'0').slice(-5);
+  const short = String(parseInt(clean, 10));
   $('#status').textContent = 'Loading…';
   try{
-    const price = await (await fetch(`data/price_${clean}.json`)).json();
+    const price = await (await fetch(`data/price_${short}.json`)).json();
     renderPrice(price);
     $('#priceTitle').textContent = `${price.symbol} — ${price.name||''}`;
   }catch(e){
-    $('#status').textContent = `No price file data/price_${clean}.json yet — run scripts/fetch_price.py ${clean}`;
+    $('#status').textContent = `No price file data/price_${short}.json yet — run scripts/fetch_price.py ${short}`;
     return;
   }
   try{
     // Prefer real file, fall back to the sample file shipped with the demo
     let ccass, isSample=false;
-    try{ ccass = await (await fetch(`data/ccass_history_${clean}.json`)).json(); }
-    catch(e){ ccass = await (await fetch(`data/ccass_history_${clean}_sample.json`)).json(); isSample=true; }
+    try{ ccass = await (await fetch(`data/ccass_history_${short}.json`)).json(); }
+    catch(e){ ccass = await (await fetch(`data/ccass_history_${short}_sample.json`)).json(); isSample=true; }
     renderCcass(ccass);
     ccassHistory = ccass; // keep for the date picker (browse past dates)
     const lastDate = ccass.dates[ccass.dates.length - 1];
     const dateInput = $('#ccassDate');
     dateInput.min = ccass.dates[0]; dateInput.max = lastDate; dateInput.value = lastDate;
     let table;
-    try{ table = await (await fetch(`data/ccass_latest_${clean}.json`)).json(); }
-    catch(e){ table = await (await fetch(`data/ccass_latest_${clean}_sample.json`)).json(); isSample=true; }
+    try{ table = await (await fetch(`data/ccass_latest_${short}.json`)).json(); }
+    catch(e){ table = await (await fetch(`data/ccass_latest_${short}_sample.json`)).json(); isSample=true; }
     renderTable(table);
     $('#status').textContent = isSample ? 'CCASS: SAMPLE data (see banner)' : 'CCASS: real HKEX data';
   }catch(e){ $('#status').textContent = 'No CCASS file yet — run scripts/fetch_ccass.py'; }
