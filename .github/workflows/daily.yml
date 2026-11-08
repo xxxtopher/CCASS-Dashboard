@@ -1,0 +1,36 @@
+name: Daily CCASS + price update
+# Runs on HK trading days after the close. CCASS holdings are published
+# overnight, so fetch in the early morning HKT; price is fetched too.
+# Commits data/*.json back to the repo, and GitHub Pages serves them.
+on:
+  schedule:
+    - cron: "30 22 * * 1-5"   # 06:30 HKT Tue-Sat = after Mon-Fri close (UTC 22:30)
+  workflow_dispatch:
+    inputs:
+      code:
+        description: "HK stock code"
+        default: "2501"
+        required: true
+permissions:
+  contents: write
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Fetch price + CCASS
+        env:
+          CODE: ${{ inputs.code || '2501' }}
+        run: |
+          python3 scripts/fetch_price.py "$CODE"
+          python3 scripts/fetch_ccass.py "$CODE" || echo "CCASS fetch failed (HKEX maintenance / form change?) - price still committed"
+      - name: Commit data
+        run: |
+          git config user.name "ccass-bot"
+          git config user.email "ccass-bot@users.noreply.github.com"
+          git add data/
+          git diff --cached --quiet || git commit -m "Daily data update $(date -u +%Y-%m-%d)"
+          git push
