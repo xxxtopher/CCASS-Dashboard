@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CCASS Dashboard — 2501.HK</title>
+<style>
+  :root{--bg:#0f172a;--card:#1e293b;--text:#e2e8f0;--muted:#94a3b8;--green:#22c55e;--red:#ef4444;--accent:#38bdf8}
+  *{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text)}
+  header{padding:20px 24px 8px} h1{margin:0;font-size:22px} p.sub{color:var(--muted);margin:6px 0 0}
+  .banner{background:#78350f;color:#fde68a;padding:10px 14px;margin:12px 24px 0;border-radius:8px;font-size:14px}
+  .controls{display:flex;gap:10px;flex-wrap:wrap;padding:16px 24px 0;align-items:end}
+  .controls label{font-size:12px;color:var(--muted);display:block;margin-bottom:4px}
+  input,select,button{padding:8px 10px;border-radius:8px;border:1px solid #334155;background:#0f172a;color:var(--text);font-size:14px}
+  button{background:var(--accent);color:#082f49;border:none;font-weight:600;cursor:pointer}
+  main{padding:16px 24px 32px;display:grid;gap:16px}
+  .card{background:var(--card);border-radius:12px;padding:16px}
+  .card h2{margin:0 0 4px;font-size:17px} .card p{color:var(--muted);font-size:13px;margin:0 0 12px}
+  #priceChart{height:420px} #ccassChart{height:360px}
+  .toggles{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+  .toggles label{font-size:13px;background:#0f172a;padding:6px 9px;border-radius:20px;cursor:pointer}
+  .kpis{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+  .kpi{background:#0f172a;border-radius:8px;padding:10px 14px;min-width:140px}
+  .kpi b{font-size:18px;display:block} .kpi span{font-size:12px;color:var(--muted)}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{padding:8px;border-bottom:1px solid #334155;text-align:right;white-space:nowrap}
+  th:first-child,td:first-child,th:nth-child(2),td:nth-child(2){text-align:left}
+  th{cursor:pointer;color:var(--muted)} .up{color:var(--green)} .down{color:var(--red)}
+  .search{margin-bottom:10px;width:280px;max-width:100%}
+  footer{padding:0 24px 24px;color:var(--muted);font-size:12px}
+  a{color:var(--accent)}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<header>
+  <h1>CCASS Dashboard</h1>
+  <p class="sub">Interactive price chart · Top 10 CCASS brokers · Daily CCASS change for all participants — in the style of DisclosureTracker, for one HK stock at a time.</p>
+</header>
+<div class="banner">✅ <b>Real data for 2501:</b> Price from Yahoo Finance to 2026-11-06, CCASS from HKEX SDW for 30 trading days, 2026-09-28 → 2026-11-06 (108 participants ever, 95 on Nov 6; 170.47M shares = 30.5% of 558.84M issued). The 9988 sample CCASS files remain in <code>data/</code> only as a format example.</div>
+
+<div class="controls">
+  <div><label>Stock code (HK)</label><input id="stockCode" value="2501" size="8"></div>
+  <div><label>Price range</label>
+    <select id="range"><option value="30">Last 30 days</option><option value="90" selected>Last 90 days</option><option value="180">Last 180 days</option></select>
+  </div>
+  <div><label>CCASS date</label><input id="ccassDate" value="2026-11-06" type="date"></div>
+  <button id="loadBtn">Load stock</button>
+  <span id="status" style="color:var(--muted);font-size:13px"></span>
+</div>
+
+<main>
+  <section class="card">
+    <h2 id="priceTitle">2501.HK — Maiyue Technology Ltd</h2>
+    <p>Interactive candlestick + volume. Drag to pan, scroll to zoom. Source: Yahoo Finance chart API, saved daily by the fetcher — GitHub Pages cannot call Yahoo directly (CORS).</p>
+    <div class="kpis" id="kpis"></div>
+    <div id="priceChart"></div>
+  </section>
+
+  <section class="card">
+    <h2>Top 10 CCASS holders — holdings over time</h2>
+    <p>Each line is one CCASS participant (broker / custodian / Stock Connect). Toggle lines on/off. Hover for exact holding on a date.</p>
+    <div class="toggles" id="toggles"></div>
+    <canvas id="ccassChart"></canvas>
+  </section>
+
+  <section class="card">
+    <h2>Daily CCASS change — all participants</h2>
+    <p id="tableMeta">Latest date in file. Click a column header to sort. Change = today − previous trading day.</p>
+    <input class="search" id="tableSearch" placeholder="Filter by participant ID or name…">
+    <div style="overflow:auto">
+    <table id="ccassTable">
+      <thead><tr>
+        <th data-k="participant_id">Participant ID</th><th data-k="name">Participant name</th>
+        <th data-k="holding">Holding (shares)</th><th data-k="pct_issued">% issued</th>
+        <th data-k="change">Daily change</th><th data-k="change_pct">Change %</th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+    </div>
+  </section>
+</main>
+<footer>
+  Sources: price — Yahoo Finance (<code>query1.finance.yahoo.com/v8/finance/chart/&lt;code&gt;.HK</code>); CCASS — HKEX Shareholding Search
+  (<a href="https://www3.hkexnews.hk/sdw/search/searchsdw.aspx">hkexnews.hk/sdw/search/searchsdw.aspx</a>, past 12 months only).
+  Webb-site (<code>webb-site.com/ccass/choldings</code>) is a useful cross-check, but its original site now redirects and its mirror was returning 403 on 7 Nov 2026 — do not rely on it as the primary feed.
+  CCASS data is HKEX data: keep it for personal research, attribute HKEX, and check HKEX's CCASS display terms before publishing it publicly at scale — DisclosureTracker itself holds an HKEX CCASS Shareholding Display Licence.
+</footer>
+
+<script>
+const $ = s => document.querySelector(s);
+let ccassChart = null, tableRows = [], sortKey = 'holding', sortDir = -1;
+let ccassHistory = null; // full {dates, participants, issued_shares} once loaded
+const fmt = n => n==null ? '—' : Math.round(n).toLocaleString('en-US');
+const fmtSigned = n => (n>0?'+':'') + fmt(n);
+
+async function loadStock(code){
+  const clean = code.replace(/[^0-9]/g,'').padStart(5,'0').slice(-5);
+  $('#status').textContent = 'Loading…';
+  try{
+    const price = await (await fetch(`data/price_${clean}.json`)).json();
+    renderPrice(price);
+    $('#priceTitle').textContent = `${price.symbol} — ${price.name||''}`;
+  }catch(e){
+    $('#status').textContent = `No price file data/price_${clean}.json yet — run scripts/fetch_price.py ${clean}`;
+    return;
+  }
+  try{
+    // Prefer real file, fall back to the sample file shipped with the demo
+    let ccass, isSample=false;
+    try{ ccass = await (await fetch(`data/ccass_history_${clean}.json`)).json(); }
+    catch(e){ ccass = await (await fetch(`data/ccass_history_${clean}_sample.json`)).json(); isSample=true; }
+    renderCcass(ccass);
+    ccassHistory = ccass; // keep for the date picker (browse past dates)
+    const lastDate = ccass.dates[ccass.dates.length - 1];
+    const dateInput = $('#ccassDate');
+    dateInput.min = ccass.dates[0]; dateInput.max = lastDate; dateInput.value = lastDate;
+    let table;
+    try{ table = await (await fetch(`data/ccass_latest_${clean}.json`)).json(); }
+    catch(e){ table = await (await fetch(`data/ccass_latest_${clean}_sample.json`)).json(); isSample=true; }
+    renderTable(table);
+    $('#status').textContent = isSample ? 'CCASS: SAMPLE data (see banner)' : 'CCASS: real HKEX data';
+  }catch(e){ $('#status').textContent = 'No CCASS file yet — run scripts/fetch_ccass.py'; }
+}
+
+function renderPrice(price){
+  const days = parseInt($('#range').value,10);
+  const candles = price.candles.slice(-days);
+  const el = $('#priceChart'); el.innerHTML='';
+  const chart = LightweightCharts.createChart(el,{width:el.clientWidth,height:420,layout:{background:{color:'transparent'},textColor:'#cbd5e1'},grid:{vertLines:{color:'#1e293b'},horzLines:{color:'#1e293b'}},timeScale:{timeVisible:false}});
+  const series = chart.addCandlestickSeries({upColor:'#22c55e',downColor:'#ef4444',wickUpColor:'#22c55e',wickDownColor:'#ef4444'});
+  series.setData(candles.map(c=>({time:c.date,open:c.open,high:c.high,low:c.low,close:c.close})));
+  const vol = chart.addHistogramSeries({priceFormat:{type:'volume'},priceScaleId:'vol'});
+  vol.setData(candles.map(c=>({time:c.date,value:c.volume,color:c.close>=c.open?'#166534':'#7f1d1d'})));
+  chart.timeScale().fitContent();
+  const last=candles[candles.length-1], first=candles[0];
+  const chg=(last.close-first.close)/first.close*100;
+  $('#kpis').innerHTML = `
+    <div class="kpi"><b>HK$${last.close.toFixed(2)}</b><span>Close ${last.date}</span></div>
+    <div class="kpi"><b class="${chg>=0?'up':'down'}">${chg>=0?'+':''}${chg.toFixed(1)}%</b><span>${days}-day change</span></div>
+    <div class="kpi"><b>${fmt(last.volume)}</b><span>Volume ${last.date}</span></div>
+    <div class="kpi"><b>HK$${Math.max(...candles.map(c=>c.high)).toFixed(2)} / ${Math.min(...candles.map(c=>c.low)).toFixed(2)}</b><span>${days}-day high / low</span></div>`;
+  window.addEventListener('resize',()=>chart.applyOptions({width:el.clientWidth}),{once:true});
+}
+
+function renderCcass(h){
+  const palette=['#38bdf8','#f472b6','#a3e635','#fbbf24','#c084fc','#34d399','#fb7185','#f97316','#22d3ee','#e879f9'];
+  const labels = h.dates;
+  // Top 10 only, by latest holding — real HKEX files hold hundreds of
+  // participants; plotting all of them would be unreadable.
+  const lastIdx = h.dates.length - 1;
+  const top10 = h.participants.slice()
+    .sort((a,b)=>(b.holdings[lastIdx]??-1)-(a.holdings[lastIdx]??-1)).slice(0,10);
+  const datasets = top10.map((p,i)=>({label:`${p.participant_id} — ${p.name}`,data:p.holdings,borderColor:palette[i%palette.length],backgroundColor:palette[i%palette.length],borderWidth:2,pointRadius:0,tension:0.1}));
+  $('#toggles').innerHTML = datasets.map((d,i)=>`<label><input type="checkbox" data-i="${i}" checked> <span style="color:${palette[i%palette.length]}">●</span> ${d.label}</label>`).join('');
+  if(ccassChart) ccassChart.destroy();
+  ccassChart = new Chart($('#ccassChart'),{type:'line',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${fmt(c.parsed.y)} shares`}}},scales:{y:{ticks:{callback:v=>(v/1e6).toFixed(0)+'M'},grid:{color:'#334155'}},x:{grid:{color:'#1e293b'},ticks:{maxTicksLimit:10}}}}});
+  document.querySelectorAll('#toggles input').forEach(cb=>cb.addEventListener('change',()=>{
+    ccassChart.setDatasetVisibility(+cb.dataset.i, cb.checked); ccassChart.update();
+  }));
+}
+
+function renderTable(t){
+  $('#tableMeta').textContent = `Date ${t.date} vs ${t.prev_date || '— (first date in file)'} · ${t.rows.length} participants · ${t.source||''}${t.note ? ' · ' + t.note : ''}`;
+  tableRows = t.rows.slice(); drawTable();
+}
+// Build the daily-change table for any date in the loaded history, from the
+// per-participant holdings series (null = no holding that day). A picked date
+// that isn't a trading day clamps to the nearest earlier date in the file.
+function renderTableForDate(picked){
+  if(!ccassHistory) return;
+  const dates = ccassHistory.dates;
+  let idx = dates.indexOf(picked);
+  let note = '';
+  if(idx < 0){
+    idx = dates.findIndex(d => d > picked) - 1; // nearest earlier date
+    if(idx < 0) idx = 0;
+    note = `${picked} is not a trading day in the file — showing ${dates[idx]}`;
+  }
+  const issued = ccassHistory.issued_shares;
+  const rows = ccassHistory.participants.map(p => {
+    const holding = p.holdings[idx] ?? 0;
+    if(!holding) return null;
+    const prev = idx > 0 ? (p.holdings[idx-1] ?? 0) : null;
+    const change = prev == null ? 0 : holding - prev;
+    return {participant_id: p.participant_id, name: p.name, holding,
+      pct_issued: issued ? holding / issued * 100 : null,
+      change, change_pct: (prev == null || !prev) ? null : Math.round(change / prev * 100000) / 1000};
+  }).filter(Boolean);
+  renderTable({date: dates[idx], prev_date: idx > 0 ? dates[idx-1] : null,
+    source: ccassHistory.source, rows, note});
+}
+function drawTable(){
+  const q = ($('#tableSearch').value||'').toLowerCase();
+  const rows = tableRows.filter(r=>!q || r.participant_id.toLowerCase().includes(q) || r.name.toLowerCase().includes(q))
+    .sort((a,b)=> (a[sortKey]>b[sortKey]?1:a[sortKey]<b[sortKey]?-1:0)*sortDir);
+  document.querySelector('#ccassTable tbody').innerHTML = rows.map(r=>`<tr>
+    <td>${r.participant_id}</td><td>${r.name}</td><td>${fmt(r.holding)}</td><td>${r.pct_issued==null?'—':r.pct_issued.toFixed(3)+'%'}</td>
+    <td class="${r.change>=0?'up':'down'}">${fmtSigned(r.change)}</td>
+    <td class="${r.change_pct>=0?'up':'down'}">${r.change_pct==null?'—':(r.change_pct>=0?'+':'')+r.change_pct.toFixed(2)+'%'}</td></tr>`).join('');
+}
+document.querySelectorAll('#ccassTable th').forEach(th=>th.addEventListener('click',()=>{
+  const k=th.dataset.k; if(sortKey===k) sortDir*=-1; else {sortKey=k; sortDir=-1;} drawTable();
+}));
+$('#tableSearch').addEventListener('input',drawTable);
+$('#ccassDate').addEventListener('change',()=>renderTableForDate($('#ccassDate').value));
+$('#loadBtn').addEventListener('click',()=>loadStock($('#stockCode').value));
+$('#range').addEventListener('change',()=>loadStock($('#stockCode').value));
+loadStock('2501');
+</script>
+</body>
+</html>

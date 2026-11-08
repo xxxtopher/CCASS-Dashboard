@@ -1,0 +1,113 @@
+{
+  "stock_code": "9988",
+  "date": "2026-11-06",
+  "prev_date": "2026-11-05",
+  "source": "SAMPLE ONLY - synthetic demo data, NOT real HKEX holdings.",
+  "issued_shares": 19000000000,
+  "rows": [
+    {
+      "participant_id": "B01470",
+      "name": "HSBC Securities Brokers (Asia) Ltd",
+      "holding": 805045899,
+      "pct_issued": 4.237,
+      "change": 667479,
+      "change_pct": 0.083
+    },
+    {
+      "participant_id": "B01274",
+      "name": "J.P. Morgan Securities (Asia Pacific) Ltd",
+      "holding": 636417952,
+      "pct_issued": 3.35,
+      "change": -614327,
+      "change_pct": -0.096
+    },
+    {
+      "participant_id": "B01299",
+      "name": "Morgan Stanley Asia Ltd",
+      "holding": 510715198,
+      "pct_issued": 2.688,
+      "change": -1857085,
+      "change_pct": -0.362
+    },
+    {
+      "participant_id": "A00003",
+      "name": "HKSCC Nominees Ltd - Stock Connect (Shanghai)",
+      "holding": 432956270,
+      "pct_issued": 2.279,
+      "change": -1205793,
+      "change_pct": -0.278
+    },
+    {
+      "participant_id": "B01126",
+      "name": "Goldman Sachs (Asia) Securities Ltd",
+      "holding": 378934921,
+      "pct_issued": 1.994,
+      "change": -571640,
+      "change_pct": -0.151
+    },
+    {
+      "participant_id": "B01220",
+      "name": "UBS Securities Hong Kong Ltd",
+      "holding": 306337541,
+      "pct_issued": 1.612,
+      "change": -80834,
+      "change_pct": -0.026
+    },
+    {
+      "participant_id": "B01142",
+      "name": "Merrill Lynch (Asia Pacific) Ltd",
+      "holding": 262113755,
+      "pct_issued": 1.38,
+      "change": 1013713,
+      "change_pct": 0.388
+    },
+    {
+      "participant_id": "B01344",
+      "name": "Citigroup Global Markets Asia Ltd",
+      "holding": 211332194,
+      "pct_issued": 1.112,
+      "change": 201640,
+      "change_pct": 0.096
+    },
+    {
+      "participant_id": "B01076",
+      "name": "Credit Suisse (Hong Kong) Ltd",
+      "holding": 171556460,
+      "pct_issued": 0.903,
+      "change": -678160,
+      "change_pct": -0.394
+    },
+    {
+      "participant_id": "B01417",
+      "name": "China International Capital Corp HK Sec Ltd",
+      "holding": 138562436,
+      "pct_issued": 0.729,
+      "change": 423375,
+      "change_pct": 0.306
+    },
+    {
+      "participant_id": "B01555",
+      "name": "Sample Broker A Ltd",
+      "holding": 45363535,
+      "pct_issued": 0.239,
+      "change": 363535,
+      "change_pct": 0.808
+    },
+    {
+      "participant_id": "B01601",
+      "name": "Sample Broker B Ltd",
+      "holding": 32029177,
+      "pct_issued": 0.169,
+      "change": 29177,
+      "change_pct": 0.091
+    },
+    {
+      "participant_id": "C00019",
+      "name": "Sample Custodian C Ltd",
+      "holding": 28187373,
+      "pct_issued": 0.148,
+      "change": 187373,
+      "change_pct": 0.669
+    }
+  ]
+}

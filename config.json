@@ -1,0 +1,1 @@
+{"default_stock_code":"2501","default_stock_name":"Maiyue Technology Limited","note":"Webb-site CCASS holdings i=34573 = HK 2501, confirmed by the user 2026-11-07. Add a code here and run scripts/fetch_price.py + scripts/fetch_ccass.py <code> --backfill 30 to add it to the dashboard.","stocks":["2501","9988","0700"]}
