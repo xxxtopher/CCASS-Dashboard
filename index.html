@@ -45,9 +45,6 @@
   <div><label>Price range</label>
     <select id="range"><option value="30">Last 30 days</option><option value="90" selected>Last 90 days</option><option value="180">Last 180 days</option></select>
   </div>
-  <div><label>CCASS date (to)</label><input id="ccassDate" value="2026-11-06" type="date"></div>
-  <div><label>From (range, optional)</label><input id="ccassDateFrom" type="date"></div>
-  <button id="rangeResetBtn" title="Clear the From date — back to the latest day's change">Latest day</button>
   <button id="loadBtn">Load stock</button>
   <span id="status" style="color:var(--muted);font-size:13px"></span>
 </div>
@@ -71,7 +68,12 @@
   <section class="card">
     <h2>Daily CCASS change — all participants</h2>
     <p id="tableMeta">Latest date in file. Click a column header to sort. Change = today − previous trading day.</p>
-    <p style="margin-top:-6px">Pick a <b>From</b> date above to see the change over a range instead: Change = holding at the To date − holding at the From date. Holders who exited by the To date are included, and holders who first appear in the range show as “new”. Clear the From date (or press “Latest day”) to go back to the latest daily change.</p>
+    <p style="margin-top:-6px">Pick a <b>From</b> date below to see the change over a range instead: Change = holding at the To date − holding at the From date. Holders who exited by the To date are included, and holders who first appear in the range show as “new”. Clear the From date (or press “Latest day”) to go back to the latest daily change. These controls only affect this table — the price chart and the % owned chart above are unchanged.</p>
+    <div class="controls" style="padding:0 0 12px">
+      <div><label>From date</label><input id="ccassDateFrom" type="date"></div>
+      <div><label>To date</label><input id="ccassDate" value="2026-11-06" type="date"></div>
+      <button id="rangeResetBtn" title="Clear the From date — back to the latest day's change">Latest day</button>
+    </div>
     <input class="search" id="tableSearch" placeholder="Filter by participant ID or name…">
     <div style="overflow:auto">
     <table id="ccassTable">
@@ -330,6 +332,12 @@ document.querySelectorAll('#ccassTable th').forEach(th=>th.addEventListener('cli
 $('#tableSearch').addEventListener('input',drawTable);
 $('#ccassDate').addEventListener('change',renderTableForPicked);
 $('#ccassDateFrom').addEventListener('change',renderTableForPicked);
+// Open the native calendar as soon as either date field is clicked
+// anywhere (some browsers only open it from the small calendar icon).
+for (const id of ['#ccassDate', '#ccassDateFrom']){
+  const el = $(id);
+  el.addEventListener('click', ()=>{ try{ if(typeof el.showPicker === 'function') el.showPicker(); }catch(e){} });
+}
 $('#rangeResetBtn').addEventListener('click',()=>{
   $('#ccassDateFrom').value = '';
   if(ccassHistory) $('#ccassDate').value = ccassHistory.dates[ccassHistory.dates.length-1];
