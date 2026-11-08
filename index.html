@@ -16,10 +16,9 @@
   main{padding:16px 24px 32px;display:grid;gap:16px}
   .card{background:var(--card);border-radius:12px;padding:16px}
   .card h2{margin:0 0 4px;font-size:17px} .card p{color:var(--muted);font-size:13px;margin:0 0 12px}
-  #priceChart{height:420px} #ccassTreemap{height:420px}
-  #stackBar{display:flex;height:28px;border-radius:6px;overflow:hidden;margin:0 0 12px}
-  #stackBar div{height:100%}
-  #stackBar span{display:block;text-align:center;font-size:11px;line-height:28px;white-space:nowrap;overflow:hidden;color:#0f172a;font-weight:600}
+  #priceChart{height:420px} #ccassArea{height:420px}
+  label.inline{display:inline-flex;gap:6px;align-items:center;font-size:13px;color:var(--text);cursor:pointer;margin-left:8px}
+  label.inline input{width:auto;padding:0}
   .kpis{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px}
   .kpi{background:#0f172a;border-radius:8px;padding:10px 14px;min-width:140px}
   .kpi b{font-size:18px;display:block} .kpi span{font-size:12px;color:var(--muted)}
@@ -39,7 +38,7 @@
   <h1>CCASS Dashboard</h1>
   <p class="sub">Interactive price chart · Top 10 CCASS brokers · Daily CCASS change for all participants — in the style of DisclosureTracker, for one HK stock at a time.</p>
 </header>
-<div class="banner">✅ <b>Real data for 2501:</b> Price from Yahoo Finance to 2026-11-06, CCASS from HKEX SDW for 30 trading days, 2026-09-28 → 2026-11-06 (108 participants ever, 95 on Nov 6; 170.47M shares = 30.5% of 558.84M issued). The 9988 sample CCASS files remain in <code>data/</code> only as a format example.</div>
+<div class="banner" id="dataBanner">✅ <b>Real data for 2501:</b> Price from Yahoo Finance, CCASS from HKEX SDW. The 9988 sample CCASS files remain in <code>data/</code> only as a format example.</div>
 
 <div class="controls">
   <div><label>Stock code (HK)</label><input id="stockCode" value="2501" size="8"></div>
@@ -60,11 +59,11 @@
   </section>
 
   <section class="card">
-    <h2>CCASS holders — true % owned (<span id="treemapDate">—</span>)</h2>
-    <p>Rectangle area = true % owned: holding ÷ <b>total issued shares</b> (<span id="treemapIssued">—</span>) on the selected date. Top 10 participants plus “Others” (all other CCASS participants) plus “Not in CCASS” (shares held outside CCASS) add up to 100% of issued shares. Hover a rectangle for the exact holding and its share of CCASS holdings. The date picker above changes this chart and the table below together.</p>
-    <div id="stackBar"></div>
-    <div id="ccassTreemap"></div>
-    <p id="treemapSummary" style="margin:12px 0 0"></p>
+    <h2>CCASS holders — % owned over time</h2>
+    <p>Stacked area: y-axis = % of total issued shares, x-axis = date (same range as the price chart above — default 90 days). Top 10 holders by the latest holding, plus “Others” and “Not in CCASS”: the stack adds to 100% of issued shares every day, so each band's thickness is that holder's % owned that day. Hover for exact %s.
+    <label class="inline"><input type="checkbox" id="hideNotInCcass"> Hide “Not in CCASS” — zoom into the CCASS holders</label></p>
+    <div id="ccassArea"></div>
+    <p id="areaSummary" style="margin:12px 0 0"></p>
   </section>
 
   <section class="card">
@@ -92,7 +91,7 @@
 
 <script>
 const $ = s => document.querySelector(s);
-let treemapChart = null, tableRows = [], sortKey = 'holding', sortDir = -1;
+let tableRows = [], sortKey = 'holding', sortDir = -1;
 let ccassHistory = null; // full {dates, participants, issued_shares} once loaded
 const fmt = n => n==null ? '—' : Math.round(n).toLocaleString('en-US');
 const fmtSigned = n => (n>0?'+':'') + fmt(n);
@@ -121,6 +120,10 @@ async function loadStock(code){
     catch(e){ ccass = await (await fetch(`data/ccass_history_${short}_sample.json`)).json(); isSample=true; }
     renderCcass(ccass);
     ccassHistory = ccass; // keep for the date picker (browse past dates)
+    const lastD = ccass.dates[ccass.dates.length-1];
+    const totL = ccass.participants.reduce((s,p)=>s+(p.holdings[ccass.dates.length-1]??0),0);
+    const issL = (ccass.issued_by_date && ccass.issued_by_date[lastD]) || ccass.issued_shares;
+    $('#dataBanner').innerHTML = `✅ <b>Real data for ${short}:</b> Price from Yahoo Finance, CCASS from HKEX SDW for ${ccass.dates.length} trading days, ${ccass.dates[0]} → ${lastD} (${ccass.participants.length} participants ever; ${fmt(totL)} shares = ${issL?(totL/issL*100).toFixed(1):'—'}% of ${fmt(issL)} issued on ${lastD}). The 9988 sample CCASS files remain in <code>data/</code> only as a format example.`;
     const lastDate = ccass.dates[ccass.dates.length - 1];
     const dateInput = $('#ccassDate');
     dateInput.min = ccass.dates[0]; dateInput.max = lastDate; dateInput.value = lastDate;
@@ -152,86 +155,75 @@ function renderPrice(price){
   window.addEventListener('resize',()=>chart.applyOptions({width:el.clientWidth}),{once:true});
 }
 
-const TREEMAP_COLORS=['#38bdf8','#f472b6','#a3e635','#fbbf24','#c084fc','#34d399','#fb7185','#f97316','#22d3ee','#e879f9','#64748b','#94a3b8'];
-// Treemap data for one date: top 10 by holding on that date + "Others" +
-// "Not in CCASS". Percentages are the TRUE % owned: holding ÷ total
-// ISSUED shares on THAT date, so all rectangles add to 100% of issued.
-// The denominator is per-date, not a fixed number: the scraper records
-// issued shares for every date it fetches (issued_by_date) and the page
-// uses that date's figure, falling back to the latest issued_shares.
-// Note the two moving parts: total issued shares only change on a
-// corporate action (placing, buyback, ...); shares moving between CCASS
-// and non-CCASS holders do NOT change it — they change the split, i.e.
-// total CCASS up / "Not in CCASS" down, or the reverse. "Not in CCASS"
-// is therefore recomputed every day as issued(date) − total CCASS(date).
-// (If no issued figure exists at all, fall back to total CCASS as the
-// denominator and omit "Not in CCASS" — that only happens for the 9988
-// sample file.)
-function treemapItems(h, idx){
-  const date = h.dates[idx];
-  const ranked = h.participants
-    .map(p=>({participant_id:p.participant_id, name:p.name, holding:p.holdings[idx]??0}))
-    .filter(p=>p.holding>0)
-    .sort((a,b)=>b.holding-a.holding);
-  const total = ranked.reduce((s,p)=>s+p.holding,0); // total CCASS that date
-  const issued = (h.issued_by_date && h.issued_by_date[date]) || h.issued_shares || 0;
-  const denom = issued || total; // denominator for the true % owned
-  const pctOf = v => denom ? v/denom*100 : 0;
-  const top10 = ranked.slice(0,10);
-  const othersHolding = ranked.slice(10).reduce((s,p)=>s+p.holding,0);
-  const items = top10.map((p,i)=>({...p, kind:'holder', color:TREEMAP_COLORS[i],
-    pct: pctOf(p.holding), pctCcass: total? p.holding/total*100 : 0}));
-  if(othersHolding>0) items.push({participant_id:'—', kind:'other',
-    name:'Others — all other CCASS participants combined',
-    holding:othersHolding, color:TREEMAP_COLORS[10],
-    pct: pctOf(othersHolding), pctCcass: total? othersHolding/total*100 : 0});
-  let notInCcassPct = 0;
-  if(issued && issued > total){
-    const notIn = issued - total;
-    notInCcassPct = pctOf(notIn);
-    items.push({participant_id:'—', kind:'not-in-ccass',
-      name:'Not in CCASS — shares held outside CCASS',
-      holding:notIn, color:TREEMAP_COLORS[11],
-      pct: notInCcassPct, pctCcass: 0});
-  }
-  return {items, total, issued,
-    top10Pct: items.filter(p=>p.kind==='holder').reduce((s,p)=>s+p.pct,0),
-    othersPct: items.find(p=>p.kind==='other')?.pct || 0,
-    notInCcassPct};
-}
-function renderTreemap(h, idx){
-  const {items, total, issued, top10Pct, othersPct, notInCcassPct} = treemapItems(h, idx);
-  const date = h.dates[idx];
-  $('#treemapDate').textContent = date;
-  $('#treemapIssued').textContent = issued ? fmt(issued) : '—';
-  // 100% stacked bar — same segments, same order and colours as the treemap
-  $('#stackBar').innerHTML = items.map(p=>
-    `<div style="width:${p.pct}%;background:${p.color}" title="${p.name}: ${fmt(p.holding)} shares (${p.pct.toFixed(1)}% of issued shares)"><span>${p.pct>=5 ? p.pct.toFixed(1)+'%' : ''}</span></div>`).join('');
-  $('#treemapSummary').textContent =
-    `${date}: ${fmt(issued)} issued shares · total CCASS ${fmt(total)} (${issued ? (total/issued*100).toFixed(1)+'% of issued' : ''}) · ` +
-    `Top 10 = ${top10Pct.toFixed(1)}% of issued · Others = ${othersPct.toFixed(1)}% · Not in CCASS = ${notInCcassPct.toFixed(1)}% · all rectangles add to 100% of issued shares.`;
-  const el = $('#ccassTreemap');
-  if(!treemapChart) treemapChart = echarts.init(el);
-  treemapChart.setOption({
-    tooltip:{formatter: p=>{
-      const d=p.data;
-      return `${d.name}<br>${fmt(d.holding)} shares · ${d.pct.toFixed(2)}% of issued shares` +
-        (d.kind!=='not-in-ccass' && d.pctCcass ? `<br>${d.pctCcass.toFixed(2)}% of CCASS holdings` : '');
-    }},
-    series:[{type:'treemap', roam:false, nodeClick:false, breadcrumb:{show:false},
-      label:{show:true, color:'#0f172a', fontWeight:600,
-        formatter: p=>`${p.data.kind==='other' ? 'Others' : p.data.kind==='not-in-ccass' ? 'Not in CCASS' : p.data.participant_id}\n${p.data.pct.toFixed(1)}%`},
-      upperLabel:{show:false},
-      itemStyle:{borderColor:'#0f172a', borderWidth:2, gapWidth:2},
-      data: items.map(p=>({name:p.name, value:p.holding, pct:p.pct, pctCcass:p.pctCcass,
-        kind:p.kind, participant_id:p.participant_id, itemStyle:{color:p.color}}))
-    }]
+const HOLDER_COLORS=['#38bdf8','#f472b6','#a3e635','#fbbf24','#c084fc','#34d399','#fb7185','#f97316','#22d3ee','#e879f9','#64748b','#94a3b8'];
+let areaChart = null;
+// Stacked-area series for % owned over time.
+// Top 10 = the 10 biggest holders on the LATEST date (fixed membership, so
+// each band is one holder across the whole window). "Others" = all other
+// CCASS participants that day. "Not in CCASS" = issued(date) − total
+// CCASS(date). Every series is holding ÷ issued shares THAT date, so the
+// stack sums to 100% of issued shares on every date — the y-axis is %
+// owned, the x-axis is the date, and each band's thickness is that
+// holder's % owned that day.
+function areaSeries(h, dateIdxs){
+  const lastIdx = h.dates.length - 1;
+  const issuedFor = idx => (h.issued_by_date && h.issued_by_date[h.dates[idx]]) || h.issued_shares || 0;
+  const totalFor = idx => h.participants.reduce((s,p)=>s+(p.holdings[idx]??0),0);
+  const top10 = h.participants
+    .map(p=>({id:p.participant_id, name:p.name, holding:p.holdings[lastIdx]??0}))
+    .filter(p=>p.holding>0).sort((a,b)=>b.holding-a.holding).slice(0,10);
+  const series = top10.map((t,i)=>{
+    const p = h.participants.find(x=>x.participant_id===t.id);
+    return {kind:'holder', id:t.id, name:t.name, color:HOLDER_COLORS[i],
+      data: dateIdxs.map(idx=>{ const iss=issuedFor(idx); return iss ? (p.holdings[idx]??0)/iss*100 : 0; })};
   });
-  treemapChart.resize();
+  series.push({kind:'other', id:'Others', name:'Others — all other CCASS participants',
+    color:HOLDER_COLORS[10], data: dateIdxs.map(idx=>{
+      const iss=issuedFor(idx); if(!iss) return 0;
+      const top = top10.reduce((s,t)=>{ const p=h.participants.find(x=>x.participant_id===t.id);
+        return s+(p.holdings[idx]??0); },0);
+      return (totalFor(idx)-top)/iss*100; })});
+  series.push({kind:'not-in-ccass', id:'Not in CCASS', name:'Not in CCASS — shares held outside CCASS',
+    color:HOLDER_COLORS[11], data: dateIdxs.map(idx=>{
+      const iss=issuedFor(idx); return iss ? (iss-totalFor(idx))/iss*100 : 0; })});
+  return {series, dates: dateIdxs.map(i=>h.dates[i])};
+}
+function renderArea(h){
+  // Same window as the price chart above: the range selector (default 90).
+  const rangeDays = parseInt($('#range').value,10) || 90;
+  const last = new Date(h.dates[h.dates.length-1]);
+  const cutoff = new Date(last); cutoff.setDate(cutoff.getDate()-(rangeDays-1));
+  const idxs = h.dates.map((d,i)=>i).filter(i=> new Date(h.dates[i]) >= cutoff);
+  const {series, dates} = areaSeries(h, idxs);
+  const hideNic = $('#hideNotInCcass').checked;
+  const shown = hideNic ? series.filter(s=>s.kind!=='not-in-ccass') : series;
+  const li = idxs.length - 1, lastDate = h.dates[idxs[idxs.length-1]];
+  const top10Pct = series.filter(s=>s.kind==='holder').reduce((s,x)=>s+x.data[li],0);
+  const othersPct = series.find(s=>s.kind==='other').data[li];
+  const nicPct = series.find(s=>s.kind==='not-in-ccass').data[li];
+  const iss = (h.issued_by_date && h.issued_by_date[lastDate]) || h.issued_shares;
+  $('#areaSummary').textContent =
+    `${lastDate}: ${fmt(iss)} issued shares · total CCASS ${(100-nicPct).toFixed(1)}% of issued · ` +
+    `Top 10 = ${top10Pct.toFixed(1)}% · Others = ${othersPct.toFixed(1)}% · Not in CCASS = ${nicPct.toFixed(1)}% · stack adds to 100% every day.`;
+  const el = $('#ccassArea');
+  if(!areaChart) areaChart = echarts.init(el);
+  areaChart.setOption({
+    tooltip:{trigger:'axis', valueFormatter: v=> v==null ? '—' : v.toFixed(2)+'% of issued'},
+    legend:{type:'scroll', textStyle:{color:'#cbd5e1'}},
+    grid:{left:56,right:16,top:36,bottom:32},
+    xAxis:{type:'category', data:dates, axisLabel:{color:'#94a3b8'}},
+    yAxis:{type:'value', min:0, max: hideNic ? undefined : 100,
+      axisLabel:{formatter:'{value}%', color:'#94a3b8'}},
+    series: shown.map(s=>({name: s.kind==='holder' ? `${s.id} — ${s.name}` : s.id,
+      type:'line', stack:'owned', areaStyle:{}, symbol:'none',
+      emphasis:{focus:'series'},
+      itemStyle:{color:s.color}, lineStyle:{width:1, color:s.color},
+      data: s.data.map(v=>Math.round(v*100)/100)}))
+  }, true);
+  areaChart.resize();
 }
 function renderCcass(h){
-  // Latest date on first load; the date picker re-renders for other dates.
-  renderTreemap(h, h.dates.length - 1);
+  renderArea(h);
 }
 
 function renderTable(t){
@@ -264,9 +256,8 @@ function renderTableForDate(picked){
   }).filter(Boolean);
   renderTable({date: dates[idx], prev_date: idx > 0 ? dates[idx-1] : null,
     source: ccassHistory.source, rows, note});
-  renderTreemap(ccassHistory, idx); // treemap follows the same picked date
 }
-window.addEventListener('resize',()=>{ if(treemapChart) treemapChart.resize(); });
+window.addEventListener('resize',()=>{ if(areaChart) areaChart.resize(); });
 function drawTable(){
   const q = ($('#tableSearch').value||'').toLowerCase();
   const rows = tableRows.filter(r=>!q || r.participant_id.toLowerCase().includes(q) || r.name.toLowerCase().includes(q))
@@ -283,6 +274,7 @@ $('#tableSearch').addEventListener('input',drawTable);
 $('#ccassDate').addEventListener('change',()=>renderTableForDate($('#ccassDate').value));
 $('#loadBtn').addEventListener('click',()=>loadStock($('#stockCode').value));
 $('#range').addEventListener('change',()=>loadStock($('#stockCode').value));
+$('#hideNotInCcass').addEventListener('change',()=>{ if(ccassHistory) renderArea(ccassHistory); });
 loadStock('2501');
 </script>
 </body>
