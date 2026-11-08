@@ -45,7 +45,9 @@
   <div><label>Price range</label>
     <select id="range"><option value="30">Last 30 days</option><option value="90" selected>Last 90 days</option><option value="180">Last 180 days</option></select>
   </div>
-  <div><label>CCASS date</label><input id="ccassDate" value="2026-11-06" type="date"></div>
+  <div><label>CCASS date (to)</label><input id="ccassDate" value="2026-11-06" type="date"></div>
+  <div><label>From (range, optional)</label><input id="ccassDateFrom" type="date"></div>
+  <button id="rangeResetBtn" title="Clear the From date — back to the latest day's change">Latest day</button>
   <button id="loadBtn">Load stock</button>
   <span id="status" style="color:var(--muted);font-size:13px"></span>
 </div>
@@ -69,12 +71,13 @@
   <section class="card">
     <h2>Daily CCASS change — all participants</h2>
     <p id="tableMeta">Latest date in file. Click a column header to sort. Change = today − previous trading day.</p>
+    <p style="margin-top:-6px">Pick a <b>From</b> date above to see the change over a range instead: Change = holding at the To date − holding at the From date. Holders who exited by the To date are included, and holders who first appear in the range show as “new”. Clear the From date (or press “Latest day”) to go back to the latest daily change.</p>
     <input class="search" id="tableSearch" placeholder="Filter by participant ID or name…">
     <div style="overflow:auto">
     <table id="ccassTable">
       <thead><tr>
         <th data-k="participant_id">Participant ID</th><th data-k="name">Participant name</th>
-        <th data-k="holding">Holding (shares)</th><th data-k="pct_issued">% issued</th>
+        <th data-k="holding">Holding (shares)</th><th data-k="start_holding" id="startHoldingTh" style="display:none">Holding at start</th><th data-k="pct_issued">% issued</th>
         <th data-k="change">Daily change</th><th data-k="change_pct">Change %</th>
       </tr></thead>
       <tbody></tbody>
@@ -92,6 +95,7 @@
 <script>
 const $ = s => document.querySelector(s);
 let tableRows = [], sortKey = 'holding', sortDir = -1;
+let rangeMode = false; // true when a From date is set: table shows change over From → To
 let ccassHistory = null; // full {dates, participants, issued_shares} once loaded
 const fmt = n => n==null ? '—' : Math.round(n).toLocaleString('en-US');
 const fmtSigned = n => (n>0?'+':'') + fmt(n);
@@ -127,6 +131,8 @@ async function loadStock(code){
     const lastDate = ccass.dates[ccass.dates.length - 1];
     const dateInput = $('#ccassDate');
     dateInput.min = ccass.dates[0]; dateInput.max = lastDate; dateInput.value = lastDate;
+    const fromInput = $('#ccassDateFrom');
+    fromInput.min = ccass.dates[0]; fromInput.max = lastDate; // left empty = latest daily change
     let table;
     try{ table = await (await fetch(`data/ccass_latest_${short}.json`)).json(); }
     catch(e){ table = await (await fetch(`data/ccass_latest_${short}_sample.json`)).json(); isSample=true; }
@@ -228,21 +234,47 @@ function renderCcass(h){
 
 function renderTable(t){
   $('#tableMeta').textContent = `Date ${t.date} vs ${t.prev_date || '— (first date in file)'} · ${t.rows.length} participants · ${t.source||''}${t.note ? ' · ' + t.note : ''}`;
+  $('#startHoldingTh').style.display = rangeMode ? '' : 'none';
   tableRows = t.rows.slice(); drawTable();
+}
+// Clamp a picked date to the nearest earlier trading day in the file.
+// (The old code did findIndex(...) - 1 and fell back to index 0, so a date
+// AFTER the last date in the file — e.g. today — wrongly showed the FIRST
+// date in the file. Fixed 2026-11-08.)
+function clampDateIdx(dates, picked){
+  let idx = dates.indexOf(picked);
+  if(idx >= 0) return {idx, note:''};
+  const next = dates.findIndex(d => d > picked);
+  if(next === -1) idx = dates.length - 1; // after the last date: latest date
+  else if(next === 0) idx = 0;            // before the first date: first date
+  else idx = next - 1;                    // nearest earlier trading day
+  return {idx, note: `${picked} is not a trading day in the file — showing ${dates[idx]}`};
+}
+// Pure range computation (no DOM): one row per participant holding at the
+// start and/or end of the range. Change = end − start; holders who exited
+// by the end date are kept (end = 0), holders who first appear in the
+// range get change_pct null ("new").
+function buildRangeRows(h, fromIdx, toIdx){
+  const issued = (h.issued_by_date && h.issued_by_date[h.dates[toIdx]]) || h.issued_shares;
+  return h.participants.map(p=>{
+    const end = p.holdings[toIdx] ?? 0;
+    const start = p.holdings[fromIdx] ?? 0;
+    if(!end && !start) return null;
+    const change = end - start;
+    return {participant_id:p.participant_id, name:p.name, holding:end, start_holding:start,
+      pct_issued: issued ? end/issued*100 : null, change,
+      change_pct: start ? Math.round(change/start*100000)/1000 : null,
+      isNew: !start && end>0, exited: !end && start>0};
+  }).filter(Boolean);
 }
 // Build the daily-change table for any date in the loaded history, from the
 // per-participant holdings series (null = no holding that day). A picked date
 // that isn't a trading day clamps to the nearest earlier date in the file.
 function renderTableForDate(picked){
   if(!ccassHistory) return;
+  rangeMode = false;
   const dates = ccassHistory.dates;
-  let idx = dates.indexOf(picked);
-  let note = '';
-  if(idx < 0){
-    idx = dates.findIndex(d => d > picked) - 1; // nearest earlier date
-    if(idx < 0) idx = 0;
-    note = `${picked} is not a trading day in the file — showing ${dates[idx]}`;
-  }
+  const {idx, note} = clampDateIdx(dates, picked);
   const issued = (ccassHistory.issued_by_date && ccassHistory.issued_by_date[dates[idx]])
     || ccassHistory.issued_shares;
   const rows = ccassHistory.participants.map(p => {
@@ -257,21 +289,52 @@ function renderTableForDate(picked){
   renderTable({date: dates[idx], prev_date: idx > 0 ? dates[idx-1] : null,
     source: ccassHistory.source, rows, note});
 }
+// Table over a date range: From → To. Same clamping as the daily view; a
+// From after the To date is swapped. The inputs are updated to the dates
+// actually shown, so what you see is what the table used.
+function renderTableForRange(fromPicked, toPicked){
+  if(!ccassHistory) return;
+  const dates = ccassHistory.dates;
+  let a = clampDateIdx(dates, fromPicked), b = clampDateIdx(dates, toPicked);
+  const notes = [];
+  if(a.note) notes.push(a.note);
+  if(b.note) notes.push(b.note);
+  if(a.idx > b.idx){ [a,b] = [b,a]; notes.push('From was after To — swapped'); }
+  $('#ccassDateFrom').value = dates[a.idx];
+  $('#ccassDate').value = dates[b.idx];
+  rangeMode = true;
+  const rows = buildRangeRows(ccassHistory, a.idx, b.idx);
+  renderTable({date: dates[b.idx], prev_date: dates[a.idx], source: ccassHistory.source, rows,
+    note: `Change over the range ${dates[a.idx]} → ${dates[b.idx]} (holding at To − holding at start)` + (notes.length ? ' · ' + notes.join('; ') : '')});
+}
+// One entry point for both date inputs: no From date = latest daily change.
+function renderTableForPicked(){
+  if(!ccassHistory) return;
+  const fromVal = $('#ccassDateFrom').value;
+  if(!fromVal){ renderTableForDate($('#ccassDate').value); return; }
+  renderTableForRange(fromVal, $('#ccassDate').value);
+}
 window.addEventListener('resize',()=>{ if(areaChart) areaChart.resize(); });
 function drawTable(){
   const q = ($('#tableSearch').value||'').toLowerCase();
   const rows = tableRows.filter(r=>!q || r.participant_id.toLowerCase().includes(q) || r.name.toLowerCase().includes(q))
     .sort((a,b)=> (a[sortKey]>b[sortKey]?1:a[sortKey]<b[sortKey]?-1:0)*sortDir);
   document.querySelector('#ccassTable tbody').innerHTML = rows.map(r=>`<tr>
-    <td>${r.participant_id}</td><td>${r.name}</td><td>${fmt(r.holding)}</td><td>${r.pct_issued==null?'—':r.pct_issued.toFixed(3)+'%'}</td>
+    <td>${r.participant_id}</td><td>${r.name}</td><td>${fmt(r.holding)}</td>${rangeMode?`<td>${fmt(r.start_holding)}</td>`:''}<td>${r.pct_issued==null?'—':r.pct_issued.toFixed(3)+'%'}</td>
     <td class="${r.change>=0?'up':'down'}">${fmtSigned(r.change)}</td>
-    <td class="${r.change_pct>=0?'up':'down'}">${r.change_pct==null?'—':(r.change_pct>=0?'+':'')+r.change_pct.toFixed(2)+'%'}</td></tr>`).join('');
+    <td class="${r.change_pct>=0?'up':'down'}">${r.isNew?'new':(r.change_pct==null?'—':(r.change_pct>=0?'+':'')+r.change_pct.toFixed(2)+'%')}</td></tr>`).join('');
 }
 document.querySelectorAll('#ccassTable th').forEach(th=>th.addEventListener('click',()=>{
   const k=th.dataset.k; if(sortKey===k) sortDir*=-1; else {sortKey=k; sortDir=-1;} drawTable();
 }));
 $('#tableSearch').addEventListener('input',drawTable);
-$('#ccassDate').addEventListener('change',()=>renderTableForDate($('#ccassDate').value));
+$('#ccassDate').addEventListener('change',renderTableForPicked);
+$('#ccassDateFrom').addEventListener('change',renderTableForPicked);
+$('#rangeResetBtn').addEventListener('click',()=>{
+  $('#ccassDateFrom').value = '';
+  if(ccassHistory) $('#ccassDate').value = ccassHistory.dates[ccassHistory.dates.length-1];
+  renderTableForPicked();
+});
 $('#loadBtn').addEventListener('click',()=>loadStock($('#stockCode').value));
 $('#range').addEventListener('change',()=>loadStock($('#stockCode').value));
 $('#hideNotInCcass').addEventListener('change',()=>{ if(ccassHistory) renderArea(ccassHistory); });
