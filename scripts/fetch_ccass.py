@@ -154,7 +154,14 @@ def main():
         print(f"Fetching {code5} {ds} ...", flush=True)
         rows, issued = fetch_day(opener, code5, ds)
         if issued:
+            # Record issued shares PER DATE: the denominator for that
+            # date's % owned. Total issued only changes on a corporate
+            # action (placing, buyback, ...); shares moving between
+            # CCASS and non-CCASS holders change the CCASS / Not-in-CCASS
+            # split, not the issued total. Keeping it per-date means a
+            # future placing won't rewrite the % owned on past dates.
             hist["issued_shares"] = issued
+            hist.setdefault("issued_by_date", {})[ds] = issued
         latest_pct = {r["participant_id"]: r["pct_issued"] for r in rows}
         # Insert this date at its sorted position (not just appended):
         # backfills fetch older dates after newer ones, and holdings[i]
