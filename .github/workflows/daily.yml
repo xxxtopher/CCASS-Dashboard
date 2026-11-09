@@ -8,8 +8,8 @@ on:
   workflow_dispatch:
     inputs:
       code:
-        description: "HK stock code"
-        default: "2501"
+        description: "HK stock codes (space-separated)"
+        default: "2501 2497"
         required: true
 permissions:
   contents: write
@@ -23,10 +23,12 @@ jobs:
           python-version: "3.12"
       - name: Fetch price + CCASS
         env:
-          CODE: ${{ inputs.code || '2501' }}
+          CODES: ${{ inputs.code || '2501 2497' }}
         run: |
-          python3 scripts/fetch_price.py "$CODE"
-          python3 scripts/fetch_ccass.py "$CODE" || echo "CCASS fetch failed (HKEX maintenance / form change?) - price still committed"
+          for CODE in $CODES; do
+            python3 scripts/fetch_price.py "$CODE"
+            python3 scripts/fetch_ccass.py "$CODE" || echo "CCASS fetch failed for $CODE (HKEX maintenance / form change?) - price still committed"
+          done
       - name: Commit data
         run: |
           git config user.name "ccass-bot"
