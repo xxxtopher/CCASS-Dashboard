@@ -42,6 +42,12 @@
 
 <div class="controls">
   <div><label>Stock code (HK)</label><input id="stockCode" value="2501" size="8"></div>
+  <div><label>Stock</label>
+    <select id="stockSelect">
+      <option value="2501">2501 — Maiyue Technology</option>
+      <option value="2497">2497 — Fujing Holdings</option>
+    </select>
+  </div>
   <div><label>Price range</label>
     <select id="range"><option value="30">Last 30 days</option><option value="90" selected>Last 90 days</option><option value="180">Last 180 days</option></select>
   </div>
@@ -115,6 +121,9 @@ async function loadStock(code){
     const price = await (await fetch(`data/price_${short}.json`)).json();
     renderPrice(price);
     $('#priceTitle').textContent = `${price.symbol} — ${price.name||''}`;
+    document.title = `CCASS Dashboard — ${price.symbol}`;
+    const sel = $('#stockSelect');
+    if([...sel.options].some(o=>o.value===short)) sel.value = short;
   }catch(e){
     $('#status').textContent = `No price file data/price_${short}.json yet — run scripts/fetch_price.py ${short}`;
     return;
@@ -344,6 +353,7 @@ $('#rangeResetBtn').addEventListener('click',()=>{
   renderTableForPicked();
 });
 $('#loadBtn').addEventListener('click',()=>loadStock($('#stockCode').value));
+$('#stockSelect').addEventListener('change',()=>{ $('#stockCode').value = $('#stockSelect').value; loadStock($('#stockSelect').value); });
 $('#range').addEventListener('change',()=>loadStock($('#stockCode').value));
 $('#hideNotInCcass').addEventListener('change',()=>{ if(ccassHistory) renderArea(ccassHistory); });
 loadStock('2501');
