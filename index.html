@@ -13,7 +13,15 @@
   .controls label{font-size:12px;color:var(--muted);display:block;margin-bottom:4px}
   input,select,button{padding:8px 10px;border-radius:8px;border:1px solid #334155;background:#0f172a;color:var(--text);font-size:14px}
   button{background:var(--accent);color:#082f49;border:none;font-weight:600;cursor:pointer}
-  main{padding:16px 24px 32px;display:grid;gap:16px}
+  .layout{display:grid;grid-template-columns:340px minmax(0,1fr);gap:16px;padding:16px 24px 32px;align-items:start}
+  main{display:grid;gap:16px;min-width:0}
+  aside{position:sticky;top:16px}
+  .news-item{padding:10px 0;border-bottom:1px solid #334155}
+  .news-item:last-child{border-bottom:none}
+  .news-date{font-size:12px;color:var(--muted);margin-bottom:3px}
+  .news-item a{font-size:14px;line-height:1.45;display:block}
+  .news-cat{font-size:12px;color:var(--muted);margin-top:3px}
+  @media (max-width:900px){.layout{grid-template-columns:1fr} main{order:1} aside{order:2;position:static}}
   .card{background:var(--card);border-radius:12px;padding:16px}
   .card h2{margin:0 0 4px;font-size:17px} .card p{color:var(--muted);font-size:13px;margin:0 0 12px}
   #priceChart{height:420px} #ccassArea{height:420px}
@@ -55,6 +63,13 @@
   <span id="status" style="color:var(--muted);font-size:13px"></span>
 </div>
 
+<div class="layout">
+<aside class="card" id="newsCard">
+  <h2>HKEX announcements</h2>
+  <p id="newsMeta">Last 30 days · Source: HKEXnews title search</p>
+  <div id="newsList"></div>
+</aside>
+
 <main>
   <section class="card">
     <h2 id="priceTitle">2501.HK — Maiyue Technology Ltd</h2>
@@ -93,9 +108,11 @@
     </div>
   </section>
 </main>
+</div>
 <footer>
   Sources: price — Yahoo Finance (<code>query1.finance.yahoo.com/v8/finance/chart/&lt;code&gt;.HK</code>); CCASS — HKEX Shareholding Search
-  (<a href="https://www3.hkexnews.hk/sdw/search/searchsdw.aspx">hkexnews.hk/sdw/search/searchsdw.aspx</a>, past 12 months only).
+  (<a href="https://www3.hkexnews.hk/sdw/search/searchsdw.aspx">hkexnews.hk/sdw/search/searchsdw.aspx</a>, past 12 months only); announcements — HKEX Listed Company Information title search
+  (<a href="https://www1.hkexnews.hk/search/titlesearch.xhtml">hkexnews.hk/search/titlesearch.xhtml</a>, last 30 days, refreshed daily).
   Webb-site (<code>webb-site.com/ccass/choldings</code>) is a useful cross-check, but its original site now redirects and its mirror was returning 403 on 7 Nov 2026 — do not rely on it as the primary feed.
   CCASS data is HKEX data: keep it for personal research, attribute HKEX, and check HKEX's CCASS display terms before publishing it publicly at scale — DisclosureTracker itself holds an HKEX CCASS Shareholding Display Licence.
 </footer>
@@ -150,6 +167,28 @@ async function loadStock(code){
     renderTable(table);
     $('#status').textContent = isSample ? 'CCASS: SAMPLE data (see banner)' : 'CCASS: real HKEX data';
   }catch(e){ $('#status').textContent = 'No CCASS file yet — run scripts/fetch_ccass.py'; }
+  try{
+    const news = await (await fetch(`data/news_${short}.json`)).json();
+    renderNews(news);
+  }catch(e){ renderNews(null); }
+}
+
+const esc = s => String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+// Left-hand news column: HKEX announcements for the loaded stock, last 30 days.
+function renderNews(news){
+  const el = $('#newsList'), meta = $('#newsMeta');
+  if(!news || !news.items || !news.items.length){
+    meta.textContent = 'Last 30 days · Source: HKEXnews title search';
+    el.innerHTML = '<p style="color:var(--muted)">No announcements in the last 30 days.</p>';
+    return;
+  }
+  meta.textContent = `Last 30 days (${news.from} → ${news.to}) · ${news.count} announcement${news.count==1?'':'s'} · Source: HKEXnews title search`;
+  el.innerHTML = news.items.map(it=>{
+    const d = new Date(it.date+'T'+(it.time||'00:00')+':00');
+    const ds = isNaN(d) ? it.date : d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+    const cat = [it.category, it.size].filter(Boolean).join(' · ');
+    return `<div class="news-item"><div class="news-date">${ds}${it.time?' · '+esc(it.time):''}</div><a href="${esc(it.url)}" target="_blank" rel="noopener">${esc(it.title)}</a>${cat?`<div class="news-cat">${esc(cat)}</div>`:''}</div>`;
+  }).join('');
 }
 
 function renderPrice(price){
