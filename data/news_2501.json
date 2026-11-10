@@ -1,0 +1,18 @@
+{
+  "stock_code": "2501",
+  "source": "HKEX Listed Company Information title search (www1.hkexnews.hk/search/titlesearch.xhtml)",
+  "from": "2026-10-11",
+  "to": "2026-11-10",
+  "fetched_at": "2026-11-10T05:25:28+00:00",
+  "count": 1,
+  "items": [
+    {
+      "date": "2026-11-02",
+      "time": "14:12",
+      "category": "Monthly Returns",
+      "title": "MONTHLY RETURN OF EQUITY ISSUER ON MOVEMENTS IN SECURITIES FOR THE MONTH ENDED 31 OCTOBER 2026",
+      "url": "https://www1.hkexnews.hk/listedco/listconews/sehk/2026/1102/2026110200917.pdf",
+      "size": "68KB"
+    }
+  ]
+}
