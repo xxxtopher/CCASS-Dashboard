@@ -49,10 +49,10 @@ function __doPostBack(eventTarget, eventArgument) {
 
 	<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="A7B2BBE2" />
 </div>
-<input type="hidden" name="today" id="today" value="20261109" />
+<input type="hidden" name="today" id="today" value="20261110" />
 <input type="hidden" name="sortBy" id="sortBy" />
 <input type="hidden" name="sortDirection" id="sortDirection" />
-<input type="hidden" name="originalShareholdingDate" id="originalShareholdingDate" value="2026/11/09" />
+<input type="hidden" name="originalShareholdingDate" id="originalShareholdingDate" value="2026/11/10" />
 <input type="hidden" name="alertMsg" id="alertMsg" />
 
 <div id="hkex_news_header_section" class="ccass-header-section">
@@ -65,14 +65,14 @@ function __doPostBack(eventTarget, eventArgument) {
 <li class="filter__container-input searchDate">
 <div class="form-input-text">
 <label for="searchDate">Shareholding Date</label>
-<input name="txtShareholdingDate" type="text" value="2026/11/09" id="txtShareholdingDate" class="input-searchDate active" placeholder="yyyy/mm/dd" />
+<input name="txtShareholdingDate" type="text" value="2026/11/10" id="txtShareholdingDate" class="input-searchDate active" placeholder="yyyy/mm/dd" />
 </div>
 </li>
 <li class="filter__container-input searchStockCodeName searchStock_Code">
 <div class="form-input-text-group">
 <div class="form-input-text searchStockCode">
 <label for="txtStockCode">Stock Code</label>
-<input name="txtStockCode" type="text" value="02501" maxlength="5" id="txtStockCode" name="txtStockCode" placeholder="e.g. 00001" />
+<input name="txtStockCode" type="text" value="02497" maxlength="5" id="txtStockCode" name="txtStockCode" placeholder="e.g. 00001" />
 </div>
 </div>
 <a class="reminder" href="#">List of Stocks &gt;</a>
@@ -240,11 +240,11 @@ $("#ccass-tools-container").remove();
 hkexApp.tableUtils.enableTableScrolling();
 })(jQuery, window.hkexApp);
 
-var options = { MAX: new Date('2026/11/08') };
+var options = { MAX: new Date('2026/11/09') };
 if (checkShareholdingDate.toLowerCase() == "true") {
-options.MIN = new Date('2025/11/09')
+options.MIN = new Date('2025/11/10')
 }
-$('#txtShareholdingDate').data('options', options).attr('data-reset', '2026/11/08');
+$('#txtShareholdingDate').data('options', options).attr('data-reset', '2026/11/09');
 
 $('#pnlStockNameList .droplist-item').on('click', function (e) {
 var value = $(e.target).parent().attr('data-value');
@@ -302,5 +302,5 @@ $('body').on('fontSizeChange', function () {
 $('table.table.table-scroll').scrollableTable("forcerefresh");
 });
 </script>
-<script type="text/javascript" nonce="6df06ad3f582341f93c25743ddfa0560" src="/Be4jmZZV_cOt/QeDx9SrKif/ab/2JEkGQEw/YxYYAQ/aARFBT/QCEDod?v=69ad6d92-9653-98c8-3673-626bfafc17c3" defer></script></body>
+<script type="text/javascript" nonce="520b24dafee2a699e9be902761866399" src="/eh3ErP/jS/2F/oiQX/ObgqExii6wjD8/JVwO2wOtYtw1/QS1lInI/FGx-cmp5/KCpZ?v=cc83541a-b337-0f6f-f937-4f0fec7d1730" defer></script></body>
 </html>
