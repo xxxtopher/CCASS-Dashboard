@@ -21,7 +21,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Fetch price + CCASS
+      - name: Fetch price + CCASS + news
         env:
           CODES: ${{ inputs.code || '2501 2497' }}
         run: |
@@ -36,6 +36,7 @@ jobs:
           for CODE in $CODES; do
             python3 scripts/fetch_price.py "$CODE"
             python3 scripts/fetch_ccass.py "$CODE" "$CCASS_DATE" --backfill 3 || echo "CCASS fetch failed for $CODE (HKEX maintenance / form change?) - price still committed"
+            python3 scripts/fetch_news.py "$CODE" || echo "News fetch failed for $CODE - old news file stays"
           done
       - name: Commit data
         run: |
