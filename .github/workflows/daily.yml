@@ -25,14 +25,23 @@ jobs:
         env:
           CODES: ${{ inputs.code || '2501 2497' }}
         run: |
+          # CCASS holdings for a date are published overnight AFTER the close,
+          # so at 06:30 HKT the latest available day is yesterday HKT, not
+          # today. Asking HKEX for today returns the empty search form and
+          # the fetch fails (both Nov 10 runs proved this: only price files
+          # were committed). --backfill 3 also fills any day missed earlier
+          # (HKEX outage / HK holiday); dates already in the history are skipped.
+          CCASS_DATE=$(TZ=Asia/Hong_Kong date -d 'yesterday' +%Y-%m-%d)
+          echo "Fetching CCASS for $CCASS_DATE"
           for CODE in $CODES; do
             python3 scripts/fetch_price.py "$CODE"
-            python3 scripts/fetch_ccass.py "$CODE" || echo "CCASS fetch failed for $CODE (HKEX maintenance / form change?) - price still committed"
+            python3 scripts/fetch_ccass.py "$CODE" "$CCASS_DATE" --backfill 3 || echo "CCASS fetch failed for $CODE (HKEX maintenance / form change?) - price still committed"
           done
       - name: Commit data
         run: |
           git config user.name "ccass-bot"
           git config user.email "ccass-bot@users.noreply.github.com"
+          rm -f data/_last_hkex_debug.html
           git add data/
           git diff --cached --quiet || git commit -m "Daily data update $(date -u +%Y-%m-%d)"
           git push
