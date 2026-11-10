@@ -2,7 +2,7 @@
   "symbol": "2501.HK",
   "name": "Maiyue Technology Limited",
   "currency": "HKD",
-  "fetched_at_utc": "2026-11-10T01:03:50.584120+00:00",
+  "fetched_at_utc": "2026-11-10T04:12:28.348903+00:00",
   "source": "Yahoo Finance chart API (query1.finance.yahoo.com/v8/finance/chart)",
   "candles": [
     {
@@ -1972,6 +1972,14 @@
       "low": 1.7100000381469727,
       "close": 1.7649999856948853,
       "volume": 368000
+    },
+    {
+      "date": "2026-11-10",
+      "open": 1.7649999856948853,
+      "high": 1.7999999523162842,
+      "low": 1.75,
+      "close": 1.75,
+      "volume": 244000
     }
   ]
 }
