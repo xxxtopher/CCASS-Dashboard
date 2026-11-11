@@ -1,7 +1,7 @@
 {
   "stock_code": "2497",
-  "date": "2026-11-09",
-  "prev_date": "2026-11-06",
+  "date": "2026-11-10",
+  "prev_date": "2026-11-09",
   "source": "HKEX CCASS Shareholding Search (www3.hkexnews.hk/sdw/search/searchsdw.aspx)",
   "issued_shares": 500000000,
   "rows": [
@@ -18,24 +18,24 @@
       "name": "FUTU SECURITIES INTERNATIONAL",
       "holding": 25458000,
       "pct_issued": 5.09,
-      "change": 126000,
-      "change_pct": 0.497
+      "change": 0,
+      "change_pct": 0.0
     },
     {
       "participant_id": "B01590",
       "name": "INTERACTIVE BROKERS HONG KONG LTD",
-      "holding": 16090000,
+      "holding": 16088000,
       "pct_issued": 3.21,
-      "change": 0,
-      "change_pct": 0.0
+      "change": -2000,
+      "change_pct": -0.012
     },
     {
       "participant_id": "B01853",
       "name": "CMBC SECURITIES CO LTD",
       "holding": 12220028,
       "pct_issued": 2.44,
-      "change": -24000,
-      "change_pct": -0.196
+      "change": 0,
+      "change_pct": 0.0
     },
     {
       "participant_id": "C00033",
@@ -50,8 +50,8 @@
       "name": "VALUABLE CAPITAL LTD",
       "holding": 2318000,
       "pct_issued": 0.46,
-      "change": 2000,
-      "change_pct": 0.086
+      "change": 0,
+      "change_pct": 0.0
     },
     {
       "participant_id": "B01284",
@@ -88,18 +88,18 @@
     {
       "participant_id": "C00019",
       "name": "THE HONGKONG AND SHANGHAI BANKING",
-      "holding": 780000,
+      "holding": 782000,
       "pct_issued": 0.15,
-      "change": 4000,
-      "change_pct": 0.515
+      "change": 2000,
+      "change_pct": 0.256
     },
     {
       "participant_id": "C00113",
       "name": "ABN AMRO CLEARING BANK N.V.",
       "holding": 770000,
       "pct_issued": 0.15,
-      "change": -8000,
-      "change_pct": -1.028
+      "change": 0,
+      "change_pct": 0.0
     },
     {
       "participant_id": "C00042",
@@ -146,8 +146,8 @@
       "name": "CHIEF SECURITIES LTD",
       "holding": 350000,
       "pct_issued": 0.07,
-      "change": 8000,
-      "change_pct": 2.339
+      "change": 0,
+      "change_pct": 0.0
     },
     {
       "participant_id": "B01565",
@@ -354,8 +354,8 @@
       "name": "MORGAN STANLEY HONG KONG SECURITIES LTD",
       "holding": 74000,
       "pct_issued": 0.01,
-      "change": -22000,
-      "change_pct": -22.917
+      "change": 0,
+      "change_pct": 0.0
     },
     {
       "participant_id": "B01265",
@@ -554,8 +554,8 @@
       "name": "BNP PARIBAS",
       "holding": 2000,
       "pct_issued": 0.0,
-      "change": -86000,
-      "change_pct": -97.727
+      "change": 0,
+      "change_pct": 0.0
     },
     {
       "participant_id": "B01148",
