@@ -4,7 +4,7 @@ name: Daily CCASS + price update
 # Commits data/*.json back to the repo, and GitHub Pages serves them.
 on:
   schedule:
-    - cron: "30 22 * * 1-5"   # 06:30 HKT Tue-Sat = after Mon-Fri close (UTC 22:30)
+    - cron: "30 21 * * 1-5"   # 05:30 HKT Tue-Sat = after Mon-Fri close (UTC 21:30); moved from 06:30 HKT 2026-11-12 — the data is on HKEX by ~04:30 HKT, and the earlier slot gives the 22:50 UTC summary more buffer
   workflow_dispatch:
     inputs:
       code:
@@ -26,7 +26,7 @@ jobs:
           CODES: ${{ inputs.code || '2501 2497' }}
         run: |
           # CCASS holdings for a date are published overnight AFTER the close,
-          # so at 06:30 HKT the latest available day is yesterday HKT, not
+          # so at 05:30 HKT the latest available day is yesterday HKT, not
           # today. Asking HKEX for today returns the empty search form and
           # the fetch fails (both Nov 10 runs proved this: only price files
           # were committed). --backfill 3 also fills any day missed earlier
