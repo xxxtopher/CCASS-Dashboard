@@ -1,7 +1,7 @@
 {
   "stock_code": "2497",
-  "date": "2026-11-10",
-  "prev_date": "2026-11-09",
+  "date": "2026-11-11",
+  "prev_date": "2026-11-10",
   "source": "HKEX CCASS Shareholding Search (www3.hkexnews.hk/sdw/search/searchsdw.aspx)",
   "issued_shares": 500000000,
   "rows": [
@@ -16,26 +16,26 @@
     {
       "participant_id": "B01955",
       "name": "FUTU SECURITIES INTERNATIONAL",
-      "holding": 25458000,
+      "holding": 25466000,
       "pct_issued": 5.09,
-      "change": 0,
-      "change_pct": 0.0
+      "change": 8000,
+      "change_pct": 0.031
     },
     {
       "participant_id": "B01590",
       "name": "INTERACTIVE BROKERS HONG KONG LTD",
       "holding": 16088000,
       "pct_issued": 3.21,
-      "change": -2000,
-      "change_pct": -0.012
+      "change": 0,
+      "change_pct": 0.0
     },
     {
       "participant_id": "B01853",
       "name": "CMBC SECURITIES CO LTD",
-      "holding": 12220028,
-      "pct_issued": 2.44,
-      "change": 0,
-      "change_pct": 0.0
+      "holding": 12132028,
+      "pct_issued": 2.42,
+      "change": -88000,
+      "change_pct": -0.72
     },
     {
       "participant_id": "C00033",
@@ -48,10 +48,10 @@
     {
       "participant_id": "B01904",
       "name": "VALUABLE CAPITAL LTD",
-      "holding": 2318000,
+      "holding": 2322000,
       "pct_issued": 0.46,
-      "change": 0,
-      "change_pct": 0.0
+      "change": 4000,
+      "change_pct": 0.173
     },
     {
       "participant_id": "B01284",
@@ -70,6 +70,14 @@
       "change_pct": 0.0
     },
     {
+      "participant_id": "B02142",
+      "name": "TIGER BROKERS (HK) GLOBAL LTD",
+      "holding": 1016000,
+      "pct_issued": 0.2,
+      "change": 20000,
+      "change_pct": 2.008
+    },
+    {
       "participant_id": "B01938",
       "name": "CHINA INDUSTRIAL SECURITIES",
       "holding": 1004000,
@@ -78,28 +86,20 @@
       "change_pct": 0.0
     },
     {
-      "participant_id": "B02142",
-      "name": "TIGER BROKERS (HK) GLOBAL LTD",
-      "holding": 996000,
-      "pct_issued": 0.19,
-      "change": 0,
-      "change_pct": 0.0
-    },
-    {
       "participant_id": "C00019",
       "name": "THE HONGKONG AND SHANGHAI BANKING",
-      "holding": 782000,
+      "holding": 792000,
       "pct_issued": 0.15,
-      "change": 2000,
-      "change_pct": 0.256
+      "change": 10000,
+      "change_pct": 1.279
     },
     {
       "participant_id": "C00113",
       "name": "ABN AMRO CLEARING BANK N.V.",
-      "holding": 770000,
+      "holding": 766000,
       "pct_issued": 0.15,
-      "change": 0,
-      "change_pct": 0.0
+      "change": -4000,
+      "change_pct": -0.519
     },
     {
       "participant_id": "C00042",
@@ -134,16 +134,16 @@
       "change_pct": 0.0
     },
     {
-      "participant_id": "B01696",
-      "name": "HANTEC SECURITIES CO LTD",
-      "holding": 350000,
-      "pct_issued": 0.07,
-      "change": 0,
-      "change_pct": 0.0
-    },
-    {
       "participant_id": "B01584",
       "name": "CHIEF SECURITIES LTD",
+      "holding": 378000,
+      "pct_issued": 0.07,
+      "change": 28000,
+      "change_pct": 8.0
+    },
+    {
+      "participant_id": "B01696",
+      "name": "HANTEC SECURITIES CO LTD",
       "holding": 350000,
       "pct_issued": 0.07,
       "change": 0,
@@ -352,10 +352,10 @@
     {
       "participant_id": "B01274",
       "name": "MORGAN STANLEY HONG KONG SECURITIES LTD",
-      "holding": 74000,
+      "holding": 72000,
       "pct_issued": 0.01,
-      "change": 0,
-      "change_pct": 0.0
+      "change": -2000,
+      "change_pct": -2.703
     },
     {
       "participant_id": "B01265",
@@ -404,6 +404,14 @@
       "pct_issued": 0.01,
       "change": 0,
       "change_pct": 0.0
+    },
+    {
+      "participant_id": "C00093",
+      "name": "BNP PARIBAS",
+      "holding": 26000,
+      "pct_issued": 0.0,
+      "change": 24000,
+      "change_pct": 1200.0
     },
     {
       "participant_id": "B01275",
@@ -545,14 +553,6 @@
       "participant_id": "C00048",
       "name": "CHIYU BANKING CORPORATION LTD",
       "holding": 4000,
-      "pct_issued": 0.0,
-      "change": 0,
-      "change_pct": 0.0
-    },
-    {
-      "participant_id": "C00093",
-      "name": "BNP PARIBAS",
-      "holding": 2000,
       "pct_issued": 0.0,
       "change": 0,
       "change_pct": 0.0

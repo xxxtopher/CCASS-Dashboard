@@ -1,7 +1,7 @@
 {
   "stock_code": "2501",
-  "date": "2026-11-10",
-  "prev_date": "2026-11-09",
+  "date": "2026-11-11",
+  "prev_date": "2026-11-10",
   "source": "HKEX CCASS Shareholding Search (www3.hkexnews.hk/sdw/search/searchsdw.aspx)",
   "issued_shares": 558838000,
   "rows": [
@@ -16,26 +16,26 @@
     {
       "participant_id": "B01955",
       "name": "FUTU SECURITIES INTERNATIONAL",
-      "holding": 24011560,
+      "holding": 24013560,
       "pct_issued": 4.29,
-      "change": 30000,
-      "change_pct": 0.125
+      "change": 2000,
+      "change_pct": 0.008
     },
     {
       "participant_id": "B01184",
       "name": "QUAM SECURITIES LTD",
-      "holding": 20230000,
+      "holding": 20234000,
       "pct_issued": 3.62,
-      "change": 34000,
-      "change_pct": 0.168
+      "change": 4000,
+      "change_pct": 0.02
     },
     {
       "participant_id": "B02055",
       "name": "SUNFUND SECURITIES LTD",
       "holding": 17942000,
       "pct_issued": 3.21,
-      "change": 1494000,
-      "change_pct": 9.083
+      "change": 0,
+      "change_pct": 0.0
     },
     {
       "participant_id": "B01904",
@@ -48,42 +48,42 @@
     {
       "participant_id": "C00019",
       "name": "THE HONGKONG AND SHANGHAI BANKING",
-      "holding": 11206000,
-      "pct_issued": 2.0,
-      "change": 28000,
-      "change_pct": 0.25
+      "holding": 11236000,
+      "pct_issued": 2.01,
+      "change": 30000,
+      "change_pct": 0.268
     },
     {
       "participant_id": "C00010",
       "name": "CITIBANK N.A.",
-      "holding": 5216491,
-      "pct_issued": 0.93,
-      "change": 0,
-      "change_pct": 0.0
+      "holding": 5140491,
+      "pct_issued": 0.91,
+      "change": -76000,
+      "change_pct": -1.457
     },
     {
       "participant_id": "C00033",
       "name": "BANK OF CHINA (HONG KONG) LTD",
-      "holding": 4992000,
-      "pct_issued": 0.89,
-      "change": 24000,
-      "change_pct": 0.483
+      "holding": 5112000,
+      "pct_issued": 0.91,
+      "change": 120000,
+      "change_pct": 2.404
     },
     {
       "participant_id": "B02142",
       "name": "TIGER BROKERS (HK) GLOBAL LTD",
       "holding": 3032000,
       "pct_issued": 0.54,
-      "change": 6000,
-      "change_pct": 0.198
+      "change": 0,
+      "change_pct": 0.0
     },
     {
       "participant_id": "B01590",
       "name": "INTERACTIVE BROKERS HONG KONG LTD",
-      "holding": 2812000,
+      "holding": 2802000,
       "pct_issued": 0.5,
-      "change": 6000,
-      "change_pct": 0.214
+      "change": -10000,
+      "change_pct": -0.356
     },
     {
       "participant_id": "B01565",
@@ -104,10 +104,10 @@
     {
       "participant_id": "C00042",
       "name": "CMB WING LUNG BANK LTD",
-      "holding": 1936000,
-      "pct_issued": 0.34,
-      "change": 24000,
-      "change_pct": 1.255
+      "holding": 1980000,
+      "pct_issued": 0.35,
+      "change": 44000,
+      "change_pct": 2.273
     },
     {
       "participant_id": "B01143",
@@ -118,18 +118,18 @@
       "change_pct": 0.0
     },
     {
+      "participant_id": "B01130",
+      "name": "BOCI SECURITIES LTD",
+      "holding": 1852000,
+      "pct_issued": 0.33,
+      "change": 30000,
+      "change_pct": 1.647
+    },
+    {
       "participant_id": "B01668",
       "name": "BRIGHT SMART SECURITIES INTERNATIONAL",
       "holding": 1848000,
       "pct_issued": 0.33,
-      "change": 0,
-      "change_pct": 0.0
-    },
-    {
-      "participant_id": "B01130",
-      "name": "BOCI SECURITIES LTD",
-      "holding": 1822000,
-      "pct_issued": 0.32,
       "change": 0,
       "change_pct": 0.0
     },
@@ -176,10 +176,10 @@
     {
       "participant_id": "B01584",
       "name": "CHIEF SECURITIES LTD",
-      "holding": 1238000,
+      "holding": 1252000,
       "pct_issued": 0.22,
-      "change": 8000,
-      "change_pct": 0.65
+      "change": 14000,
+      "change_pct": 1.131
     },
     {
       "participant_id": "B01901",
@@ -192,26 +192,18 @@
     {
       "participant_id": "B01829",
       "name": "HUATAI FINANCIAL HOLDINGS (HONG KONG)",
-      "holding": 1202000,
+      "holding": 1200000,
       "pct_issued": 0.21,
-      "change": 2000,
-      "change_pct": 0.167
+      "change": -2000,
+      "change_pct": -0.166
     },
     {
       "participant_id": "C00039",
       "name": "STANDARD CHARTERED BANK (HONG KONG) LTD",
       "holding": 1120000,
       "pct_issued": 0.2,
-      "change": 10000,
-      "change_pct": 0.901
-    },
-    {
-      "participant_id": "B01274",
-      "name": "MORGAN STANLEY HONG KONG SECURITIES LTD",
-      "holding": 948000,
-      "pct_issued": 0.16,
-      "change": -4000,
-      "change_pct": -0.42
+      "change": 0,
+      "change_pct": 0.0
     },
     {
       "participant_id": "B01885",
@@ -228,6 +220,14 @@
       "pct_issued": 0.16,
       "change": 0,
       "change_pct": 0.0
+    },
+    {
+      "participant_id": "B01274",
+      "name": "MORGAN STANLEY HONG KONG SECURITIES LTD",
+      "holding": 918000,
+      "pct_issued": 0.16,
+      "change": -30000,
+      "change_pct": -3.165
     },
     {
       "participant_id": "B02210",
@@ -256,18 +256,18 @@
     {
       "participant_id": "B01673",
       "name": "FULBRIGHT SECURITIES LTD",
-      "holding": 724000,
+      "holding": 722000,
       "pct_issued": 0.12,
-      "change": 0,
-      "change_pct": 0.0
+      "change": -2000,
+      "change_pct": -0.276
     },
     {
       "participant_id": "C00093",
       "name": "BNP PARIBAS",
-      "holding": 709509,
+      "holding": 671509,
       "pct_issued": 0.12,
-      "change": -116000,
-      "change_pct": -14.052
+      "change": -38000,
+      "change_pct": -5.356
     },
     {
       "participant_id": "B01228",
@@ -294,6 +294,14 @@
       "change_pct": 0.0
     },
     {
+      "participant_id": "B01345",
+      "name": "PHILLIP SECURITIES (HONG KONG) LTD",
+      "holding": 572000,
+      "pct_issued": 0.1,
+      "change": 6000,
+      "change_pct": 1.06
+    },
+    {
       "participant_id": "B02195",
       "name": "LONG BRIDGE HK LTD",
       "holding": 570000,
@@ -304,26 +312,10 @@
     {
       "participant_id": "B01727",
       "name": "ICBC (ASIA) SECURITIES LTD",
-      "holding": 570000,
-      "pct_issued": 0.1,
-      "change": 0,
-      "change_pct": 0.0
-    },
-    {
-      "participant_id": "B01345",
-      "name": "PHILLIP SECURITIES (HONG KONG) LTD",
-      "holding": 566000,
-      "pct_issued": 0.1,
-      "change": 0,
-      "change_pct": 0.0
-    },
-    {
-      "participant_id": "C00113",
-      "name": "ABN AMRO CLEARING BANK N.V.",
-      "holding": 522000,
+      "holding": 520000,
       "pct_issued": 0.09,
-      "change": -8000,
-      "change_pct": -1.509
+      "change": -50000,
+      "change_pct": -8.772
     },
     {
       "participant_id": "B02032",
@@ -334,20 +326,28 @@
       "change_pct": 0.0
     },
     {
+      "participant_id": "C00113",
+      "name": "ABN AMRO CLEARING BANK N.V.",
+      "holding": 510000,
+      "pct_issued": 0.09,
+      "change": -12000,
+      "change_pct": -2.299
+    },
+    {
       "participant_id": "B02159",
       "name": "USMART SECURITIES LTD",
-      "holding": 476000,
+      "holding": 492000,
       "pct_issued": 0.08,
-      "change": 0,
-      "change_pct": 0.0
+      "change": 16000,
+      "change_pct": 3.361
     },
     {
       "participant_id": "B01181",
       "name": "FOSUN INTERNATIONAL SECURITIES LTD",
-      "holding": 462000,
+      "holding": 458000,
       "pct_issued": 0.08,
-      "change": -14000,
-      "change_pct": -2.941
+      "change": -4000,
+      "change_pct": -0.866
     },
     {
       "participant_id": "B02213",
@@ -410,16 +410,16 @@
       "name": "NANYANG COMMERCIAL BANK LTD",
       "holding": 268000,
       "pct_issued": 0.04,
-      "change": -18000,
-      "change_pct": -6.294
+      "change": 0,
+      "change_pct": 0.0
     },
     {
       "participant_id": "B01224",
       "name": "MERRILL LYNCH FAR EAST LTD",
       "holding": 202000,
       "pct_issued": 0.03,
-      "change": -28000,
-      "change_pct": -12.174
+      "change": 0,
+      "change_pct": 0.0
     },
     {
       "participant_id": "B01298",
@@ -504,10 +504,10 @@
     {
       "participant_id": "C00037",
       "name": "SHANGHAI COMMERCIAL BANK LTD",
-      "holding": 102000,
-      "pct_issued": 0.01,
-      "change": 20000,
-      "change_pct": 24.39
+      "holding": 112000,
+      "pct_issued": 0.02,
+      "change": 10000,
+      "change_pct": 9.804
     },
     {
       "participant_id": "B01118",
@@ -542,14 +542,6 @@
       "change_pct": 0.0
     },
     {
-      "participant_id": "B01161",
-      "name": "UBS SECURITIES HONG KONG LTD",
-      "holding": 66000,
-      "pct_issued": 0.01,
-      "change": -12000,
-      "change_pct": -15.385
-    },
-    {
       "participant_id": "B01959",
       "name": "ZHONGTAI INTERNATIONAL SECURITIES LTD",
       "holding": 62000,
@@ -570,8 +562,8 @@
       "name": "BANK OF COMMUNICATIONS TRUSTEE LTD",
       "holding": 60000,
       "pct_issued": 0.01,
-      "change": 10000,
-      "change_pct": 20.0
+      "change": 0,
+      "change_pct": 0.0
     },
     {
       "participant_id": "B01119",
@@ -662,6 +654,14 @@
       "change_pct": 0.0
     },
     {
+      "participant_id": "B01264",
+      "name": "MIB SECURITIES (HONG KONG) LTD",
+      "holding": 20000,
+      "pct_issued": 0.0,
+      "change": 4000,
+      "change_pct": 25.0
+    },
+    {
       "participant_id": "C00003",
       "name": "THE BANK OF EAST ASIA LTD",
       "holding": 16000,
@@ -670,20 +670,20 @@
       "change_pct": 0.0
     },
     {
-      "participant_id": "B01264",
-      "name": "MIB SECURITIES (HONG KONG) LTD",
-      "holding": 16000,
-      "pct_issued": 0.0,
-      "change": 4000,
-      "change_pct": 33.333
-    },
-    {
       "participant_id": "B01695",
       "name": "DAH SING SECURITIES LTD",
       "holding": 12000,
       "pct_issued": 0.0,
       "change": 0,
       "change_pct": 0.0
+    },
+    {
+      "participant_id": "B01161",
+      "name": "UBS SECURITIES HONG KONG LTD",
+      "holding": 8000,
+      "pct_issued": 0.0,
+      "change": -58000,
+      "change_pct": -87.879
     },
     {
       "participant_id": "B01615",
@@ -764,6 +764,14 @@
       "pct_issued": 0.0,
       "change": 0,
       "change_pct": 0.0
+    },
+    {
+      "participant_id": "B01451",
+      "name": "GOLDMAN SACHS (ASIA) SECURITIES LTD",
+      "holding": 2000,
+      "pct_issued": 0.0,
+      "change": null,
+      "change_pct": null
     },
     {
       "participant_id": "B01769",
