@@ -44,9 +44,9 @@
 <body>
 <header>
   <h1>CCASS Dashboard</h1>
-  <p class="sub">Interactive price chart · Top 10 CCASS brokers · Daily CCASS change for all participants — in the style of DisclosureTracker, for one HK stock at a time.</p>
+  <p class="sub">Interactive price chart · Top 10 CCASS brokers · Daily CCASS change for all participants — one HK stock at a time.</p>
 </header>
-<div class="banner" id="dataBanner">✅ <b>Real data for 2501:</b> Price from Yahoo Finance, CCASS from HKEX SDW. The 9988 sample CCASS files remain in <code>data/</code> only as a format example.</div>
+<div class="banner" id="dataBanner">✅ <b>Real data for 2501:</b> Price from Yahoo Finance, CCASS from HKEX SDW.</div>
 
 <div class="controls">
   <div><label>Stock code (HK)</label><input id="stockCode" value="2501" size="8"></div>
@@ -114,7 +114,7 @@
   (<a href="https://www3.hkexnews.hk/sdw/search/searchsdw.aspx">hkexnews.hk/sdw/search/searchsdw.aspx</a>, past 12 months only); announcements — HKEX Listed Company Information title search
   (<a href="https://www1.hkexnews.hk/search/titlesearch.xhtml">hkexnews.hk/search/titlesearch.xhtml</a>, last 30 days, refreshed daily).
   Webb-site (<code>webb-site.com/ccass/choldings</code>) is a useful cross-check, but its original site now redirects and its mirror was returning 403 on 7 Nov 2026 — do not rely on it as the primary feed.
-  CCASS data is HKEX data: keep it for personal research, attribute HKEX, and check HKEX's CCASS display terms before publishing it publicly at scale — DisclosureTracker itself holds an HKEX CCASS Shareholding Display Licence.
+  CCASS data is HKEX data: keep it for personal research, attribute HKEX, and check HKEX's CCASS display terms before publishing it publicly at scale.
 </footer>
 
 <script>
@@ -146,26 +146,21 @@ async function loadStock(code){
     return;
   }
   try{
-    // Prefer real file, fall back to the sample file shipped with the demo
-    let ccass, isSample=false;
-    try{ ccass = await (await fetch(`data/ccass_history_${short}.json`)).json(); }
-    catch(e){ ccass = await (await fetch(`data/ccass_history_${short}_sample.json`)).json(); isSample=true; }
+    const ccass = await (await fetch(`data/ccass_history_${short}.json`)).json();
     renderCcass(ccass);
     ccassHistory = ccass; // keep for the date picker (browse past dates)
     const lastD = ccass.dates[ccass.dates.length-1];
     const totL = ccass.participants.reduce((s,p)=>s+(p.holdings[ccass.dates.length-1]??0),0);
     const issL = (ccass.issued_by_date && ccass.issued_by_date[lastD]) || ccass.issued_shares;
-    $('#dataBanner').innerHTML = `✅ <b>Real data for ${short}:</b> Price from Yahoo Finance, CCASS from HKEX SDW for ${ccass.dates.length} trading days, ${ccass.dates[0]} → ${lastD} (${ccass.participants.length} participants ever; ${fmt(totL)} shares = ${issL?(totL/issL*100).toFixed(1):'—'}% of ${fmt(issL)} issued on ${lastD}). The 9988 sample CCASS files remain in <code>data/</code> only as a format example.`;
+    $('#dataBanner').innerHTML = `✅ <b>Real data for ${short}:</b> Price from Yahoo Finance, CCASS from HKEX SDW for ${ccass.dates.length} trading days, ${ccass.dates[0]} → ${lastD} (${ccass.participants.length} participants ever; ${fmt(totL)} shares = ${issL?(totL/issL*100).toFixed(1):'—'}% of ${fmt(issL)} issued on ${lastD}).`;
     const lastDate = ccass.dates[ccass.dates.length - 1];
     const dateInput = $('#ccassDate');
     dateInput.min = ccass.dates[0]; dateInput.max = lastDate; dateInput.value = lastDate;
     const fromInput = $('#ccassDateFrom');
     fromInput.min = ccass.dates[0]; fromInput.max = lastDate; // left empty = latest daily change
-    let table;
-    try{ table = await (await fetch(`data/ccass_latest_${short}.json`)).json(); }
-    catch(e){ table = await (await fetch(`data/ccass_latest_${short}_sample.json`)).json(); isSample=true; }
+    const table = await (await fetch(`data/ccass_latest_${short}.json`)).json();
     renderTable(table);
-    $('#status').textContent = isSample ? 'CCASS: SAMPLE data (see banner)' : 'CCASS: real HKEX data';
+    $('#status').textContent = 'CCASS: real HKEX data';
   }catch(e){ $('#status').textContent = 'No CCASS file yet — run scripts/fetch_ccass.py'; }
   try{
     const news = await (await fetch(`data/news_${short}.json`)).json();
