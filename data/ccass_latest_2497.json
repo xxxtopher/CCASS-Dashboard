@@ -1,7 +1,7 @@
 {
   "stock_code": "2497",
-  "date": "2026-11-12",
-  "prev_date": "2026-11-11",
+  "date": "2026-11-13",
+  "prev_date": "2026-11-12",
   "source": "HKEX CCASS Shareholding Search (www3.hkexnews.hk/sdw/search/searchsdw.aspx)",
   "issued_shares": 500000000,
   "rows": [
@@ -16,26 +16,26 @@
     {
       "participant_id": "B01955",
       "name": "FUTU SECURITIES INTERNATIONAL",
-      "holding": 25512000,
-      "pct_issued": 5.1,
-      "change": 46000,
-      "change_pct": 0.181
+      "holding": 25574000,
+      "pct_issued": 5.11,
+      "change": 62000,
+      "change_pct": 0.243
     },
     {
       "participant_id": "B01590",
       "name": "INTERACTIVE BROKERS HONG KONG LTD",
-      "holding": 16088000,
+      "holding": 16070000,
       "pct_issued": 3.21,
-      "change": 0,
-      "change_pct": 0.0
+      "change": -18000,
+      "change_pct": -0.112
     },
     {
       "participant_id": "B01853",
       "name": "CMBC SECURITIES CO LTD",
-      "holding": 12086028,
+      "holding": 12080028,
       "pct_issued": 2.41,
-      "change": -46000,
-      "change_pct": -0.379
+      "change": -6000,
+      "change_pct": -0.05
     },
     {
       "participant_id": "C00033",
@@ -50,8 +50,8 @@
       "name": "VALUABLE CAPITAL LTD",
       "holding": 2326000,
       "pct_issued": 0.46,
-      "change": 4000,
-      "change_pct": 0.172
+      "change": 0,
+      "change_pct": 0.0
     },
     {
       "participant_id": "B01284",
@@ -88,10 +88,10 @@
     {
       "participant_id": "C00019",
       "name": "THE HONGKONG AND SHANGHAI BANKING",
-      "holding": 792000,
+      "holding": 794000,
       "pct_issued": 0.15,
-      "change": 0,
-      "change_pct": 0.0
+      "change": 2000,
+      "change_pct": 0.253
     },
     {
       "participant_id": "C00113",
@@ -138,8 +138,8 @@
       "name": "CHIEF SECURITIES LTD",
       "holding": 368000,
       "pct_issued": 0.07,
-      "change": -10000,
-      "change_pct": -2.646
+      "change": 0,
+      "change_pct": 0.0
     },
     {
       "participant_id": "B01696",
@@ -278,14 +278,6 @@
       "change_pct": 0.0
     },
     {
-      "participant_id": "B01224",
-      "name": "MERRILL LYNCH FAR EAST LTD",
-      "holding": 122000,
-      "pct_issued": 0.02,
-      "change": -2000,
-      "change_pct": -1.613
-    },
-    {
       "participant_id": "B01423",
       "name": "PRUDENTIAL BROKERAGE LTD",
       "holding": 113990,
@@ -340,6 +332,14 @@
       "pct_issued": 0.01,
       "change": 0,
       "change_pct": 0.0
+    },
+    {
+      "participant_id": "B01224",
+      "name": "MERRILL LYNCH FAR EAST LTD",
+      "holding": 82000,
+      "pct_issued": 0.01,
+      "change": -40000,
+      "change_pct": -32.787
     },
     {
       "participant_id": "C00003",
@@ -410,8 +410,8 @@
       "name": "BNP PARIBAS",
       "holding": 34000,
       "pct_issued": 0.0,
-      "change": 8000,
-      "change_pct": 30.769
+      "change": 0,
+      "change_pct": 0.0
     },
     {
       "participant_id": "B01275",
