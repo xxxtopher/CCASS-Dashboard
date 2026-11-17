@@ -24,6 +24,7 @@
   @media (max-width:900px){.layout{grid-template-columns:1fr} main{order:1} aside{order:2;position:static}}
   .card{background:var(--card);border-radius:12px;padding:16px}
   .card h2{margin:0 0 4px;font-size:17px} .card p{color:var(--muted);font-size:13px;margin:0 0 12px}
+  #nonCcassLine b{color:var(--text)}
   #priceChart{height:420px} #ccassArea{height:420px}
   label.inline{display:inline-flex;gap:6px;align-items:center;font-size:13px;color:var(--text);cursor:pointer;margin-left:8px}
   label.inline input{width:auto;padding:0}
@@ -89,6 +90,7 @@
   <section class="card">
     <h2>Daily CCASS change — all participants</h2>
     <p id="tableMeta">Latest date in file. Click a column header to sort. Change = today − previous trading day.</p>
+    <p id="nonCcassLine"></p>
     <p style="margin-top:-6px">Pick a <b>From</b> date below to see the change over a range instead: Change = holding at the To date − holding at the From date. Holders who exited by the To date are included, and holders who first appear in the range show as “new”. Clear the From date (or press “Latest day”) to go back to the latest daily change. These controls only affect this table — the price chart and the % owned chart above are unchanged.</p>
     <div class="controls" style="padding:0 0 12px">
       <div><label>From date</label><input id="ccassDateFrom" type="date"></div>
@@ -158,8 +160,15 @@ async function loadStock(code){
     dateInput.min = ccass.dates[0]; dateInput.max = lastDate; dateInput.value = lastDate;
     const fromInput = $('#ccassDateFrom');
     fromInput.min = ccass.dates[0]; fromInput.max = lastDate; // left empty = latest daily change
-    const table = await (await fetch(`data/ccass_latest_${short}.json`)).json();
-    renderTable(table);
+    // Table comes from the history file, NOT ccass_latest: the latest
+    // file stores change=null for first-appearing holders, which the
+    // table showed as "—" and sorted as 0 — Fortune (HK) Securities
+    // (+2,424,000 on 2026-11-16) sat mid-table at rank 20 instead of
+    // topping the gainers. renderTableForDate computes change from
+    // holdings, so a first appearance counts as its full holding.
+    // Fixed 2026-11-16. (ccass_latest is still written by the fetcher
+    // and read by the daily summary script; the page no longer needs it.)
+    renderTableForDate(lastDate);
     $('#status').textContent = 'CCASS: real HKEX data';
   }catch(e){ $('#status').textContent = 'No CCASS file yet — run scripts/fetch_ccass.py'; }
   try{
@@ -277,8 +286,27 @@ function renderCcass(h){
   renderArea(h);
 }
 
+// Non-CCASS = issued shares − total CCASS holdings, per date. Change is
+// the move in that balance (usually the mirror of the CCASS total change,
+// unless issued shares changed that day — e.g. a placing).
+function nonCcassStats(h, idx, prevIdx){
+  const issuedFor = i => (h.issued_by_date && h.issued_by_date[h.dates[i]]) || h.issued_shares || 0;
+  const totalFor = i => h.participants.reduce((s,p)=>s+(p.holdings[i]??0),0);
+  const iss = issuedFor(idx), tot = totalFor(idx);
+  const out = {total: iss - tot, pct: iss ? (iss-tot)/iss*100 : null, change: null};
+  if(prevIdx != null){
+    const issP = issuedFor(prevIdx), totP = totalFor(prevIdx);
+    out.change = (iss - tot) - (issP - totP);
+  }
+  return out;
+}
+
 function renderTable(t){
   $('#tableMeta').textContent = `Date ${t.date} vs ${t.prev_date || '— (first date in file)'} · ${t.rows.length} participants · ${t.source||''}${t.note ? ' · ' + t.note : ''}`;
+  const nc = t.nonCcass;
+  $('#nonCcassLine').innerHTML = nc
+    ? `Non-CCASS: <b>${fmt(nc.total)}</b> shares${nc.pct==null?'':` (${nc.pct.toFixed(2)}% of issued)`} · ${nc.label} <b class="${nc.change==null?'':(nc.change>=0?'up':'down')}">${nc.change==null?'—':fmtSigned(nc.change)}</b>`
+    : '';
   $('#startHoldingTh').style.display = rangeMode ? '' : 'none';
   tableRows = t.rows.slice(); drawTable();
 }
@@ -329,10 +357,12 @@ function renderTableForDate(picked){
     const change = prev == null ? 0 : holding - prev;
     return {participant_id: p.participant_id, name: p.name, holding,
       pct_issued: issued ? holding / issued * 100 : null,
-      change, change_pct: (prev == null || !prev) ? null : Math.round(change / prev * 100000) / 1000};
+      change, change_pct: (prev == null || !prev) ? null : Math.round(change / prev * 100000) / 1000,
+      isNew: !prev}; // first appearance: full holding counts as the gain, shown as "new"
   }).filter(Boolean);
   renderTable({date: dates[idx], prev_date: idx > 0 ? dates[idx-1] : null,
-    source: ccassHistory.source, rows, note});
+    source: ccassHistory.source, rows, note,
+    nonCcass: {...nonCcassStats(ccassHistory, idx, idx > 0 ? idx-1 : null), label: 'day change'}});
 }
 // Table over a date range: From → To. Same clamping as the daily view; a
 // From after the To date is swapped. The inputs are updated to the dates
@@ -350,7 +380,8 @@ function renderTableForRange(fromPicked, toPicked){
   rangeMode = true;
   const rows = buildRangeRows(ccassHistory, a.idx, b.idx);
   renderTable({date: dates[b.idx], prev_date: dates[a.idx], source: ccassHistory.source, rows,
-    note: `Change over the range ${dates[a.idx]} → ${dates[b.idx]} (holding at To − holding at start)` + (notes.length ? ' · ' + notes.join('; ') : '')});
+    note: `Change over the range ${dates[a.idx]} → ${dates[b.idx]} (holding at To − holding at start)` + (notes.length ? ' · ' + notes.join('; ') : ''),
+    nonCcass: {...nonCcassStats(ccassHistory, b.idx, a.idx), label: 'change over the range'}});
 }
 // One entry point for both date inputs: no From date = latest daily change.
 function renderTableForPicked(){
