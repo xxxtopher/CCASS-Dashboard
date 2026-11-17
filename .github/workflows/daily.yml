@@ -2,9 +2,22 @@ name: Daily CCASS + price update
 # Runs on HK trading days after the close. CCASS holdings are published
 # overnight, so fetch in the early morning HKT; price is fetched too.
 # Commits data/*.json back to the repo, and GitHub Pages serves them.
+#
+# SCHEDULING NOTE (2026-11-17): GitHub's scheduler fired this job 3.5–6.5h
+# late every night Nov 9–16 — the run is only *created* hours after the
+# slot, while the job itself takes ~1 min once it starts. Nothing in this
+# file causes that: the cron is valid and registered, there is no
+# concurrency block or skip condition, and the repo is active (daily bot
+# commits), so the delay is on GitHub's side and GitHub gives no SLA for
+# scheduled runs. Instead of a single trigger, fire every 30 min across
+# 21:00–23:30 UTC and let the first run that actually starts do the work:
+# the check step below skips the fetch when both stocks already have the
+# target date, so later triggers exit in seconds and nothing is fetched
+# twice. The fetch itself is idempotent (dates already in the history are
+# skipped), so a late duplicate run can never add duplicate data.
 on:
   schedule:
-    - cron: "30 21 * * 1-5"   # 05:30 HKT Tue-Sat = after Mon-Fri close (UTC 21:30); moved from 06:30 HKT 2026-11-12 — the data is on HKEX by ~04:30 HKT, and the earlier slot gives the 22:50 UTC summary more buffer
+    - cron: "*/30 21-23 * * 1-5"   # 21:00–23:30 UTC Mon–Fri = 05:00–07:30 HKT; first firing run fetches, the rest no-op (see check step)
   workflow_dispatch:
     inputs:
       code:
@@ -21,7 +34,28 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Check if this date is already fetched
+        id: check
+        env:
+          CODES: ${{ inputs.code || '2501 2497' }}
+        run: |
+          # Target date is yesterday HKT for every trigger in the window
+          # (the HKT date only changes at 16:00 UTC, so all triggers in
+          # 21:00–23:30 UTC target the same day). If every stock already
+          # has it, there is nothing to do and the fetch step is skipped.
+          # A failed fetch does NOT mark the date done, so the next
+          # trigger retries it.
+          TARGET=$(TZ=Asia/Hong_Kong date -d 'yesterday' +%Y-%m-%d)
+          echo "target=$TARGET" >> "$GITHUB_OUTPUT"
+          NEEDED=false
+          for CODE in $CODES; do
+            HAVE=$(python3 -c "import json; print(json.load(open('data/ccass_latest_${CODE}.json'))['date'])" 2>/dev/null || echo none)
+            echo "$CODE: have $HAVE, target $TARGET"
+            [ "$HAVE" != "$TARGET" ] && NEEDED=true
+          done
+          echo "needed=$NEEDED" >> "$GITHUB_OUTPUT"
       - name: Fetch price + CCASS + news
+        if: steps.check.outputs.needed == 'true'
         env:
           CODES: ${{ inputs.code || '2501 2497' }}
         run: |
@@ -45,4 +79,4 @@ jobs:
           rm -f data/_last_hkex_debug.html
           git add data/
           git diff --cached --quiet || git commit -m "Daily data update $(date -u +%Y-%m-%d)"
-          git push
+          git push || echo "push failed (another run may have committed first) - data already in repo"
