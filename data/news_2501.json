@@ -1,11 +1,35 @@
 {
   "stock_code": "2501",
   "source": "HKEX Listed Company Information title search (www1.hkexnews.hk/search/titlesearch.xhtml)",
-  "from": "2026-10-19",
-  "to": "2026-11-18",
-  "fetched_at": "2026-11-18T02:49:51+00:00",
-  "count": 2,
+  "from": "2026-10-20",
+  "to": "2026-11-19",
+  "fetched_at": "2026-11-19T02:26:50+00:00",
+  "count": 5,
   "items": [
+    {
+      "date": "2026-11-18",
+      "time": "16:35",
+      "category": "Proxy Forms",
+      "title": "FORM OF PROXY FOR EXTRAORDINARY GENERAL MEETING (OR ANY ADJOURMENT THEREOF)",
+      "url": "https://www1.hkexnews.hk/listedco/listconews/sehk/2026/1118/2026111800478.pdf",
+      "size": "124KB"
+    },
+    {
+      "date": "2026-11-18",
+      "time": "16:32",
+      "category": "Announcements and Notices - [Notice of EGM&#x2f;SGM]",
+      "title": "NOTICE OF EXTRAORDINARY GENERAL MEETING",
+      "url": "https://www1.hkexnews.hk/listedco/listconews/sehk/2026/1118/2026111800462.pdf",
+      "size": "122KB"
+    },
+    {
+      "date": "2026-11-18",
+      "time": "16:30",
+      "category": "Circulars - [Change in Auditors subject to Shareholders&#x27; Approval]",
+      "title": "PROPOSED CHANGE OF AUDITOR AND NOTICE OF EXTRAORDINARY GENERAL MEETING",
+      "url": "https://www1.hkexnews.hk/listedco/listconews/sehk/2026/1118/2026111800444.pdf",
+      "size": "193KB"
+    },
     {
       "date": "2026-11-13",
       "time": "21:30",

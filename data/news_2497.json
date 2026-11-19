@@ -1,9 +1,9 @@
 {
   "stock_code": "2497",
   "source": "HKEX Listed Company Information title search (www1.hkexnews.hk/search/titlesearch.xhtml)",
-  "from": "2026-10-19",
-  "to": "2026-11-18",
-  "fetched_at": "2026-11-18T02:50:17+00:00",
+  "from": "2026-10-20",
+  "to": "2026-11-19",
+  "fetched_at": "2026-11-19T02:27:18+00:00",
   "count": 1,
   "items": [
     {
