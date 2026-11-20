@@ -1,9 +1,9 @@
 {
   "stock_code": "2501",
   "source": "HKEX Listed Company Information title search (www1.hkexnews.hk/search/titlesearch.xhtml)",
-  "from": "2026-10-20",
-  "to": "2026-11-19",
-  "fetched_at": "2026-11-19T02:26:50+00:00",
+  "from": "2026-10-21",
+  "to": "2026-11-20",
+  "fetched_at": "2026-11-20T02:11:00+00:00",
   "count": 5,
   "items": [
     {

@@ -2,17 +2,9 @@
   "symbol": "2497.HK",
   "name": "Fujing Holdings Co., Limited",
   "currency": "HKD",
-  "fetched_at_utc": "2026-11-19T02:26:50.903093+00:00",
+  "fetched_at_utc": "2026-11-20T02:11:00.565114+00:00",
   "source": "Yahoo Finance chart API (query1.finance.yahoo.com/v8/finance/chart)",
   "candles": [
-    {
-      "date": "2025-11-19",
-      "open": 0.5199999809265137,
-      "high": 0.5199999809265137,
-      "low": 0.5,
-      "close": 0.5,
-      "volume": 292000
-    },
     {
       "date": "2025-11-20",
       "open": 0.550000011920929,
@@ -1975,11 +1967,11 @@
     },
     {
       "date": "2026-11-19",
-      "open": 0.4950000047683716,
-      "high": 0.5049999952316284,
+      "open": 0.5049999952316284,
+      "high": 0.5099999904632568,
       "low": 0.4950000047683716,
       "close": 0.5049999952316284,
-      "volume": 140000
+      "volume": 236000
     }
   ]
 }
