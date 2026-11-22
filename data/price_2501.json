@@ -2,7 +2,7 @@
   "symbol": "2501.HK",
   "name": "Maiyue Technology Limited",
   "currency": "HKD",
-  "fetched_at_utc": "2026-11-21T02:03:42.795341+00:00",
+  "fetched_at_utc": "2026-11-22T07:16:52.817739+00:00",
   "source": "Yahoo Finance chart API (query1.finance.yahoo.com/v8/finance/chart)",
   "candles": [
     {
