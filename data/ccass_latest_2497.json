@@ -1,7 +1,7 @@
 {
   "stock_code": "2497",
-  "date": "2026-11-23",
-  "prev_date": "2026-11-20",
+  "date": "2026-11-24",
+  "prev_date": "2026-11-23",
   "source": "HKEX CCASS Shareholding Search (www3.hkexnews.hk/sdw/search/searchsdw.aspx)",
   "issued_shares": 500000000,
   "rows": [
@@ -16,26 +16,26 @@
     {
       "participant_id": "B01955",
       "name": "FUTU SECURITIES INTERNATIONAL",
-      "holding": 25922000,
-      "pct_issued": 5.18,
-      "change": 30000,
-      "change_pct": 0.116
+      "holding": 25758000,
+      "pct_issued": 5.15,
+      "change": -164000,
+      "change_pct": -0.633
     },
     {
       "participant_id": "B01590",
       "name": "INTERACTIVE BROKERS HONG KONG LTD",
-      "holding": 16394000,
-      "pct_issued": 3.27,
-      "change": 96000,
-      "change_pct": 0.589
+      "holding": 16538000,
+      "pct_issued": 3.3,
+      "change": 144000,
+      "change_pct": 0.878
     },
     {
       "participant_id": "B01853",
       "name": "CMBC SECURITIES CO LTD",
       "holding": 11410028,
       "pct_issued": 2.28,
-      "change": -54000,
-      "change_pct": -0.471
+      "change": 0,
+      "change_pct": 0.0
     },
     {
       "participant_id": "C00033",
@@ -128,10 +128,10 @@
     {
       "participant_id": "B01584",
       "name": "CHIEF SECURITIES LTD",
-      "holding": 398000,
+      "holding": 396000,
       "pct_issued": 0.07,
-      "change": 8000,
-      "change_pct": 2.051
+      "change": -2000,
+      "change_pct": -0.503
     },
     {
       "participant_id": "B01353",
@@ -330,8 +330,8 @@
       "name": "MORGAN STANLEY HONG KONG SECURITIES LTD",
       "holding": 82000,
       "pct_issued": 0.01,
-      "change": 2000,
-      "change_pct": 2.5
+      "change": 0,
+      "change_pct": 0.0
     },
     {
       "participant_id": "C00003",
@@ -390,6 +390,14 @@
       "change_pct": 0.0
     },
     {
+      "participant_id": "B01224",
+      "name": "MERRILL LYNCH FAR EAST LTD",
+      "holding": 40000,
+      "pct_issued": 0.0,
+      "change": 22000,
+      "change_pct": 122.222
+    },
+    {
       "participant_id": "B01275",
       "name": "SANFULL SECURITIES LTD",
       "holding": 20000,
@@ -409,14 +417,6 @@
       "participant_id": "C00037",
       "name": "SHANGHAI COMMERCIAL BANK LTD",
       "holding": 20000,
-      "pct_issued": 0.0,
-      "change": 0,
-      "change_pct": 0.0
-    },
-    {
-      "participant_id": "B01224",
-      "name": "MERRILL LYNCH FAR EAST LTD",
-      "holding": 18000,
       "pct_issued": 0.0,
       "change": 0,
       "change_pct": 0.0
@@ -530,8 +530,8 @@
       "name": "KGI ASIA LTD",
       "holding": 4000,
       "pct_issued": 0.0,
-      "change": -82000,
-      "change_pct": -95.349
+      "change": 0,
+      "change_pct": 0.0
     },
     {
       "participant_id": "B01814",
